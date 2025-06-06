@@ -23,7 +23,7 @@ EXE_FILES := $(patsubst $(SRC_DIR)/%.cpp,$(BIN_DIR)/%$(EXE_EXT),$(CPP_FILES))
 
 # Regla para compilar cada archivo .cpp y generar el archivo ejecutable correspondiente
 $(BIN_DIR)/%$(EXE_EXT): $(SRC_DIR)/%.cpp
-	g++ $< -o $@ $(SFML) -Iinclude
+	g++ -std=c++17 $< -o $@ $(SFML) -Iinclude
 
 # Regla por defecto para compilar todos los archivos .cpp
 all: $(EXE_FILES)

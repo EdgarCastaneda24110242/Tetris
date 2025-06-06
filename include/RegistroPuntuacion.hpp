@@ -7,7 +7,6 @@ using namespace std;
 
 class RegistroPuntuacion {
 private:
-    vector<Puntaje*> historial;
 public:
     void guardarPuntaje(Puntaje* puntaje);
 };

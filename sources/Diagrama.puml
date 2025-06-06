@@ -1,13 +1,5 @@
 @startuml Tetris
 
-interface IPuntaje {
-  +sumarPuntos(puntos: int)
-}
-
-interface IEntradaJugador {
-  +leerEntrada()
-}
-
 class EstadoJuego {
   -estadoActual: string
   +iniciarJuego()
@@ -15,14 +7,19 @@ class EstadoJuego {
   +finalizarJuego()
 }
 
+class Ventana {
+  +mostrar()
+  +cerrar()
+}
+
 class SesionJuego {
-  -fechaInicio: Date
+  -fechaInicio: fecha
   -duracion: int
   +iniciarSesion()
   +finalizarSesion()
 }
 
-class ProximaPieza {
+class Pieza {
   -pieza: string
   +generarPieza()
 }
@@ -39,7 +36,7 @@ class Nivel {
   +subirNivel()
 }
 
-class Puntaje implements IPuntaje {
+class Puntaje {
   -puntajeActual: int
   +sumarPuntos(puntos: int)
   +reiniciarPuntaje()
@@ -78,7 +75,7 @@ class Jugador {
 }
 
 class RegistroPuntuacion {
-  -historial: Puntaje[]
+  -registro: Puntaje[]
   +guardarPuntaje(puntaje: Puntaje)
 }
 
@@ -87,7 +84,7 @@ class Configuracion {
   +cambiarDificultad(nuevaDificultad: string)
 }
 
-class EntradaJugador implements IEntradaJugador {
+class EntradaJugador{
   +leerEntrada()
 }
 

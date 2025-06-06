@@ -3,11 +3,10 @@
 #include <vector>
 using namespace std;
 
-#include "Celda.h"
+#include "Celda.hpp"
 
 class Tablero {
 private:
-    vector<vector<Celda>> celdas;
 public:
     void limpiarLineas();
     void agregarPieza();
