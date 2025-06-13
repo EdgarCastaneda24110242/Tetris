@@ -11,7 +11,7 @@
 
 class Juego {
 public:
-    Juego();
+    Juego(sf::RenderWindow& ventanaPrincipal); // Constructor que acepta una referencia a la ventana principal
     void jugar();
 private:
     Ventana ventana;

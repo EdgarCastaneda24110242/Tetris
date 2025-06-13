@@ -6,8 +6,8 @@
 #include <iostream> // Incluir para std::cerr
 #include <fstream>  // Incluir para std::ifstream
 
-Juego::Juego()
-    : ventana((Tablero::ANCHO + 6) * BLOCK_SIZE, Tablero::ALTO * BLOCK_SIZE, "Tetris SFML"), gameOver(false), musica("assets/music/Tetris.ogg") {
+Juego::Juego(sf::RenderWindow& ventanaPrincipal)
+    : ventana(ventanaPrincipal), gameOver(false), musica("assets/music/Tetris.ogg") {
     piezaActual = nullptr;
     proximaPieza = new Pieza(rand() % 7); // Inicializar proximaPieza con una nueva pieza
     puntaje = 0;
@@ -50,7 +50,6 @@ void Juego::jugar() {
     // Reducir el volumen de la música de fondo Tetris
     musica.setVolume(33); // Reducir el volumen a un tercio
 
-    Ventana ventana((Tablero::ANCHO + 6) * BLOCK_SIZE, Tablero::ALTO * BLOCK_SIZE, "Tetris SFML");
     sf::Clock clock;
     float timer = 0, delay = 0.5;
 
