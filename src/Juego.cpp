@@ -51,8 +51,8 @@ void Juego::dibujarProximaPieza() {
     size_t piezaAlto = proximaPieza->forma.size() * BLOCK_SIZE;
 
     // Centrar la pieza dentro del recuadro con un ajuste adicional
-    float piezaOffsetX = recuadroX + (recuadroAncho - piezaAncho) / 2 - 6; // Sin ajuste horizontal
-    float piezaOffsetY = recuadroY + (recuadroAlto - piezaAlto) / 2 + 13.5; // Ajuste adicional hacia abajo
+    float piezaOffsetX = recuadroX + (recuadroAncho - piezaAncho) / 2 + 2; // Sin ajuste horizontal
+    float piezaOffsetY = recuadroY + (recuadroAlto - piezaAlto) / 2 + 113; // Ajuste adicional hacia abajo
 
     // Dibujar cada bloque de la próxima pieza
     for (size_t i = 0; i < proximaPieza->forma.size(); ++i) {
@@ -248,29 +248,86 @@ void Juego::jugar() {
 
         // Cargar la fuente Arial desde la ruta correcta
         sf::Font fuente;
-        if (!fuente.loadFromFile("assets/fonts/arial.ttf")) {
-            std::cerr << "Error: No se pudo cargar la fuente Arial desde 'assets/fonts/arial.ttf'. Verifica que el archivo exista y sea válido." << std::endl;
+        if (!fuente.loadFromFile("assets/fonts/Pixel.ttf")) {
+            std::cerr << "Error: No se pudo cargar la fuente Pixel desde 'assets/fonts/Pixel.ttf'. Verifica que el archivo exista y sea válido." << std::endl;
+            return; // Salir si no se puede cargar la fuente
         }
 
         // Configurar y dibujar el texto 'PUNTOS'
         sf::Text textoPuntos;
         textoPuntos.setFont(fuente);
         textoPuntos.setString("PUNTOS");
-        textoPuntos.setCharacterSize(24); // Tamaño de letra
+        textoPuntos.setCharacterSize(32); // Incrementar el tamaño de letra
         textoPuntos.setFillColor(sf::Color::White); // Color blanco
         textoPuntos.setStyle(sf::Text::Bold); // Negrita
-        textoPuntos.setPosition(Tablero::ANCHO * BLOCK_SIZE + BLOCK_SIZE, BLOCK_SIZE); // Posición dentro del recuadro
+        textoPuntos.setPosition(Tablero::ANCHO * BLOCK_SIZE + BLOCK_SIZE + 3, BLOCK_SIZE + 63); // Ajuste de posición para mayor visibilidad
 
         // Dibujar el texto 'PUNTOS'
         ventana.getWindow().draw(textoPuntos);
 
         // Dibujar un recuadro pequeño más abajo del letrero de "PUNTOS"
         sf::RectangleShape recuadro(sf::Vector2f(120, 120)); // Tamaño del recuadro
-        recuadro.setFillColor(sf::Color(50, 50, 50)); // Color de fondo
+        recuadro.setFillColor(sf::Color(30, 30, 30)); // Color de fondo
         recuadro.setOutlineThickness(2);
         recuadro.setOutlineColor(sf::Color::White); // Borde blanco
-        recuadro.setPosition(Tablero::ANCHO * BLOCK_SIZE + BLOCK_SIZE + 2, 200); // Posición más abajo y ligeramente a la derecha del letrero "PUNTOS"
+        recuadro.setPosition(Tablero::ANCHO * BLOCK_SIZE + BLOCK_SIZE + 10, 300); // Posición más abajo sin cambiar horizontalmente
         ventana.getWindow().draw(recuadro);
+
+        // Dibujar un recuadro para mostrar los puntos acumulados
+        sf::RectangleShape recuadroPuntos(sf::Vector2f(120, 50)); // Tamaño del recuadro
+        recuadroPuntos.setFillColor(sf::Color(30, 30, 30)); // Color de fondo
+        recuadroPuntos.setOutlineThickness(2);
+        recuadroPuntos.setOutlineColor(sf::Color::White); // Borde blanco
+        recuadroPuntos.setPosition(Tablero::ANCHO * BLOCK_SIZE + BLOCK_SIZE + 10, BLOCK_SIZE + 120); // Posición debajo del texto 'PUNTOS'
+        ventana.getWindow().draw(recuadroPuntos);
+
+        // Configurar y dibujar el texto de los puntos acumulados
+        sf::Text textoAcumulado;
+        textoAcumulado.setFont(fuente);
+        textoAcumulado.setString(std::to_string(puntaje)); // Mostrar el puntaje actual
+        textoAcumulado.setCharacterSize(24); // Tamaño de letra
+        textoAcumulado.setFillColor(sf::Color::White); // Color blanco
+        textoAcumulado.setStyle(sf::Text::Bold); // Negrita
+        textoAcumulado.setPosition(Tablero::ANCHO * BLOCK_SIZE + BLOCK_SIZE + 60, BLOCK_SIZE + 130); // Posición dentro del recuadro
+
+        // Dibujar el texto de los puntos acumulados
+        ventana.getWindow().draw(textoAcumulado);
+
+        // Configurar y dibujar el texto 'SIG PIEZA'
+        sf::Text textoSigPieza;
+        textoSigPieza.setFont(fuente);
+        textoSigPieza.setString("SIG PIEZA");
+        textoSigPieza.setCharacterSize(24); // Tamaño de letra
+        textoSigPieza.setFillColor(sf::Color::White); // Color blanco
+        textoSigPieza.setStyle(sf::Text::Bold); // Negrita
+        textoSigPieza.setPosition(Tablero::ANCHO * BLOCK_SIZE + BLOCK_SIZE + 5, 250); // Posición arriba del recuadro
+
+        // Dibujar el texto 'SIG PIEZA'
+        ventana.getWindow().draw(textoSigPieza);
+
+        // Configurar y dibujar el texto 'NIVEL'
+        sf::Text textoNivel;
+        textoNivel.setFont(fuente);
+        textoNivel.setString("NIVEL");
+        textoNivel.setCharacterSize(24); // Tamaño de letra
+        textoNivel.setFillColor(sf::Color::White); // Color blanco
+        textoNivel.setStyle(sf::Text::Bold); // Negrita
+        textoNivel.setPosition(Tablero::ANCHO * BLOCK_SIZE + BLOCK_SIZE + 40, 463); // Posición adecuada
+
+        // Dibujar el texto 'NIVEL'
+        ventana.getWindow().draw(textoNivel);
+
+        // Configurar y dibujar el texto del nivel actual
+        sf::Text textoNivelActual;
+        textoNivelActual.setFont(fuente);
+        textoNivelActual.setString(std::to_string(nivel)); // Mostrar el nivel actual
+        textoNivelActual.setCharacterSize(24); // Tamaño de letra
+        textoNivelActual.setFillColor(sf::Color::White); // Color blanco
+        textoNivelActual.setStyle(sf::Text::Bold); // Negrita
+        textoNivelActual.setPosition(Tablero::ANCHO * BLOCK_SIZE + BLOCK_SIZE + 63.5, 512); // Posición debajo del texto 'NIVEL'
+
+        // Dibujar el texto del nivel actual
+        ventana.getWindow().draw(textoNivelActual);
 
         // Dibujar la próxima pieza
         dibujarProximaPieza();
