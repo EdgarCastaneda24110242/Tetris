@@ -233,6 +233,14 @@ void Juego::jugar() {
         // Dibujar el texto 'PUNTOS'
         ventana.getWindow().draw(textoPuntos);
 
+        // Dibujar un recuadro pequeño más abajo del letrero de "PUNTOS"
+        sf::RectangleShape recuadro(sf::Vector2f(100, 100)); // Tamaño del recuadro
+        recuadro.setFillColor(sf::Color(50, 50, 50)); // Color de fondo
+        recuadro.setOutlineThickness(2);
+        recuadro.setOutlineColor(sf::Color::White); // Borde blanco
+        recuadro.setPosition(Tablero::ANCHO * BLOCK_SIZE + BLOCK_SIZE + 14, 200); // Posición más abajo y ligeramente a la derecha del letrero "PUNTOS"
+        ventana.getWindow().draw(recuadro);
+
         ventana.mostrar();
     }
     if (piezaActual) delete piezaActual;
