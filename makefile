@@ -1,40 +1,27 @@
-# Directorios de origen y destino
-SRC_DIR := sources
-BIN_DIR := bin
+CXX = g++
+CXXFLAGS = -std=c++11 -Iinclude
 
-# Detectar el sistema operativo
-ifeq ($(OS),Windows_NT)
-    EXE_EXT := .exe
-    RM := del /Q
-    RUN := $(BIN_DIR)/%$(EXE_EXT)
-else
-    EXE_EXT :=
-    RM := rm -f
-    RUN := ./$(BIN_DIR)/%
-    # Si usas Homebrew para SFML, usa estos flags:
-    SFML := -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio -lbox2d
-endif
+SRCDIR = src
+INCDIR = include
+BINDIR = bin
 
-# Obtener todos los archivos .cpp en el directorio de origen
-CPP_FILES := $(wildcard $(SRC_DIR)/*.cpp)
+SOURCES = $(wildcard $(SRCDIR)/*.cpp)
+OBJECTS = $(patsubst $(SRCDIR)/%.cpp,$(BINDIR)/%.o,$(SOURCES))
+TARGET = $(BINDIR)/tetris
 
-# Generar los nombres de los archivos ejecutables en el directorio de destino
-EXE_FILES := $(patsubst $(SRC_DIR)/%.cpp,$(BIN_DIR)/%$(EXE_EXT),$(CPP_FILES))
+all: $(BINDIR) $(TARGET)
 
-# Regla para compilar cada archivo .cpp y generar el archivo ejecutable correspondiente
-$(BIN_DIR)/%$(EXE_EXT): $(SRC_DIR)/%.cpp
-	g++ -std=c++17 $< -o $@ $(SFML) -Iinclude
+$(BINDIR):
+	mkdir -p $(BINDIR)
 
-# Regla por defecto para compilar todos los archivos .cpp
-all: $(EXE_FILES)
+$(BINDIR)/%.o: $(SRCDIR)/%.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-# Regla para ejecutar cada archivo ejecutable
-run%: $(BIN_DIR)/%$(EXE_EXT)
-	$(BIN_DIR)/$*$(EXE_EXT)
+$(TARGET): $(OBJECTS)
+	$(CXX) $(CXXFLAGS) -o $@ $^ -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio
 
-# Regla para limpiar los archivos generados
+runtetrix: all
+	$(TARGET)
+
 clean:
-	$(RM) $(EXE_FILES)
-
-.PHONY: all clean
-.PHONY: run-%
+	rm -rf $(BINDIR)/*.o $(TARGET)
