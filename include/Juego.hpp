@@ -26,4 +26,5 @@ private:
     Musica musica; // Manejo de la música de fondo
     void nuevaPieza();
     void actualizarPuntaje();
+    void dibujarProximaPieza(); // Declaración de la función para dibujar la próxima pieza
 };

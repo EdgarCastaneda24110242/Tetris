@@ -1,6 +1,7 @@
 #include "Juego.hpp"
 #include "GameOverScreen.hpp"
 #include "Audio.hpp"
+#include "ColorPieza.hpp" // Incluir el encabezado para usar ColorPieza
 #include <SFML/Graphics.hpp>
 #include <cstdlib>
 #include <iostream> // Incluir para std::cerr
@@ -36,6 +37,36 @@ void Juego::nuevaPieza() {
     }
 
     proximaPieza = new Pieza(rand() % 7); // Genera una nueva próxima pieza
+}
+
+void Juego::dibujarProximaPieza() {
+    // Dimensiones del recuadro
+    float recuadroX = Tablero::ANCHO * BLOCK_SIZE + BLOCK_SIZE + 20;
+    float recuadroY = 200;
+    float recuadroAncho = 100; // Ancho del recuadro
+    float recuadroAlto = 100;  // Alto del recuadro
+
+    // Dimensiones de la próxima pieza
+    size_t piezaAncho = proximaPieza->forma[0].size() * BLOCK_SIZE;
+    size_t piezaAlto = proximaPieza->forma.size() * BLOCK_SIZE;
+
+    // Centrar la pieza dentro del recuadro con un ajuste adicional
+    float piezaOffsetX = recuadroX + (recuadroAncho - piezaAncho) / 2 - 6; // Sin ajuste horizontal
+    float piezaOffsetY = recuadroY + (recuadroAlto - piezaAlto) / 2 + 13.5; // Ajuste adicional hacia abajo
+
+    // Dibujar cada bloque de la próxima pieza
+    for (size_t i = 0; i < proximaPieza->forma.size(); ++i) {
+        for (size_t j = 0; j < proximaPieza->forma[i].size(); ++j) {
+            if (proximaPieza->forma[i][j] != 0) {
+                sf::RectangleShape bloque(sf::Vector2f(BLOCK_SIZE - 4, BLOCK_SIZE - 4));
+                bloque.setFillColor(ColorPieza::obtener(proximaPieza->tipo + 1));
+                bloque.setOutlineThickness(2);
+                bloque.setOutlineColor(sf::Color::Black);
+                bloque.setPosition(piezaOffsetX + j * BLOCK_SIZE, piezaOffsetY + i * BLOCK_SIZE);
+                ventana.getWindow().draw(bloque);
+            }
+        }
+    }
 }
 
 void Juego::jugar() {
@@ -234,12 +265,15 @@ void Juego::jugar() {
         ventana.getWindow().draw(textoPuntos);
 
         // Dibujar un recuadro pequeño más abajo del letrero de "PUNTOS"
-        sf::RectangleShape recuadro(sf::Vector2f(100, 100)); // Tamaño del recuadro
+        sf::RectangleShape recuadro(sf::Vector2f(120, 120)); // Tamaño del recuadro
         recuadro.setFillColor(sf::Color(50, 50, 50)); // Color de fondo
         recuadro.setOutlineThickness(2);
         recuadro.setOutlineColor(sf::Color::White); // Borde blanco
-        recuadro.setPosition(Tablero::ANCHO * BLOCK_SIZE + BLOCK_SIZE + 14, 200); // Posición más abajo y ligeramente a la derecha del letrero "PUNTOS"
+        recuadro.setPosition(Tablero::ANCHO * BLOCK_SIZE + BLOCK_SIZE + 2, 200); // Posición más abajo y ligeramente a la derecha del letrero "PUNTOS"
         ventana.getWindow().draw(recuadro);
+
+        // Dibujar la próxima pieza
+        dibujarProximaPieza();
 
         ventana.mostrar();
     }
