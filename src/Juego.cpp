@@ -102,6 +102,8 @@ void Juego::jugar() {
     Audio sonidoLinea("assets/music/LineaPunto.ogg");
     sonidoLinea.setVolume(50); // Ajustar el volumen
 
+    bool enPausa = false; // Variable para rastrear el estado de pausa
+
     while (ventana.estaAbierta() && !gameOver) {
         float time = clock.restart().asSeconds();
         timer += time;
@@ -110,229 +112,281 @@ void Juego::jugar() {
         while (ventana.obtenerEvento(e)) {
             if (e.type == sf::Event::Closed)
                 ventana.getWindow().close();
-            Controles::Accion accion = Controles::procesarEvento(e);
-            switch (accion) {
-                case Controles::MoverIzquierda:
-                    piezaActual->x--; if (tablero.colision(*piezaActual)) piezaActual->x++;
-                    break;
-                case Controles::MoverDerecha:
-                    piezaActual->x++; if (tablero.colision(*piezaActual)) piezaActual->x--;
-                    break;
-                case Controles::Bajar:
-                    piezaActual->y++;
-                    if (tablero.colision(*piezaActual)) {
-                        piezaActual->y--;
-                        tablero.fijarPieza(*piezaActual);
 
-                        // Reproducir el sonido al fijar la pieza
-                        sonidoHit.reproducir();
+            // Detectar la tecla 'Q' para alternar entre pausa y reanudar
+            if (e.type == sf::Event::KeyPressed && e.key.code == sf::Keyboard::Q) {
+                enPausa = !enPausa; // Alternar el estado de pausa
+                continue; // Asegurar que el estado de pausa se procese correctamente
+            }
 
-                        // Incrementar puntaje y nivel
-                        int lineasEliminadas = tablero.limpiarLineas(ventana.getWindow()); // Pasar la ventana como argumento
-                        if (lineasEliminadas > 0) {
-                            sonidoLinea.reproducir(); // Reproducir sonido si se eliminan líneas
+            if (!enPausa) {
+                Controles::Accion accion = Controles::procesarEvento(e);
+                switch (accion) {
+                    case Controles::MoverIzquierda:
+                        piezaActual->x--; if (tablero.colision(*piezaActual)) piezaActual->x++;
+                        break;
+                    case Controles::MoverDerecha:
+                        piezaActual->x++; if (tablero.colision(*piezaActual)) piezaActual->x--;
+                        break;
+                    case Controles::Bajar:
+                        piezaActual->y++;
+                        if (tablero.colision(*piezaActual)) {
+                            piezaActual->y--;
+                            tablero.fijarPieza(*piezaActual);
+
+                            // Reproducir el sonido al fijar la pieza
+                            sonidoHit.reproducir();
+
+                            // Incrementar puntaje y nivel
+                            int lineasEliminadas = tablero.limpiarLineas(ventana.getWindow()); // Pasar la ventana como argumento
+                            if (lineasEliminadas > 0) {
+                                sonidoLinea.reproducir(); // Reproducir sonido si se eliminan líneas
+                            }
+                            puntaje += lineasEliminadas * 100;
+                            nivel = 1 + puntaje / 1000; // Subir nivel cada 1000 puntos
+                            delay = velocidadBase / nivel; // Aumentar velocidad
+
+                            nuevaPieza();
                         }
-                        puntaje += lineasEliminadas * 100;
-                        nivel = 1 + puntaje / 1000; // Subir nivel cada 1000 puntos
-                        delay = velocidadBase / nivel; // Aumentar velocidad
-
-                        nuevaPieza();
-                    }
-                    break;
-                case Controles::Rotar:
-                    piezaActual->rotar();
-                    if (tablero.colision(*piezaActual)) {
+                        break;
+                    case Controles::Rotar:
                         piezaActual->rotar();
-                    } else {
-                        // Reproducir el sonido al rotar la pieza
-                        sonidoMover.reproducir();
+                        if (tablero.colision(*piezaActual)) {
+                            piezaActual->rotar();
+                        } else {
+                            // Reproducir el sonido al rotar la pieza
+                            sonidoMover.reproducir();
+                        }
+                        break;
+                    case Controles::Salir:
+                        // Cambiar la funcionalidad de 'Salir' para que no cierre la ventana
+                        enPausa = !enPausa; // Alternar el estado de pausa
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+
+        if (!enPausa) {
+            // Actualizar la lógica del juego solo si no está en pausa
+            if (timer > delay) {
+                piezaActual->y++;
+                if (tablero.colision(*piezaActual)) {
+                    piezaActual->y--;
+                    tablero.fijarPieza(*piezaActual);
+
+                    // Reproducir el sonido al fijar la pieza
+                    sonidoHit.reproducir();
+
+                    // Incrementar puntaje y nivel
+                    int lineasEliminadas = tablero.limpiarLineas(ventana.getWindow()); // Pasar la ventana como argumento
+                    if (lineasEliminadas > 0) {
+                        sonidoLinea.reproducir(); // Reproducir sonido si se eliminan líneas
                     }
-                    break;
-                case Controles::Salir:
-                    ventana.getWindow().close();
-                    break;
-                default:
-                    break;
-            }
-        }
+                    puntaje += lineasEliminadas * 100;
+                    nivel = 1 + puntaje / 1000; // Subir nivel cada 1000 puntos
+                    delay = velocidadBase / nivel; // Aumentar velocidad
 
-        if (timer > delay) {
-            piezaActual->y++;
-            if (tablero.colision(*piezaActual)) {
-                piezaActual->y--;
-                tablero.fijarPieza(*piezaActual);
-
-                // Reproducir el sonido al fijar la pieza
-                sonidoHit.reproducir();
-
-                // Incrementar puntaje y nivel
-                int lineasEliminadas = tablero.limpiarLineas(ventana.getWindow()); // Pasar la ventana como argumento
-                if (lineasEliminadas > 0) {
-                    sonidoLinea.reproducir(); // Reproducir sonido si se eliminan líneas
+                    nuevaPieza();
                 }
-                puntaje += lineasEliminadas * 100;
-                nivel = 1 + puntaje / 1000; // Subir nivel cada 1000 puntos
-                delay = velocidadBase / nivel; // Aumentar velocidad
-
-                nuevaPieza();
+                timer = 0;
             }
-            timer = 0;
-        }
 
-        ventana.limpiar();
+            ventana.limpiar();
 
-        // Dibuja el tablero with un color uniforme para las piezas fijadas
-        for (int i = 0; i < Tablero::ALTO; ++i) {
-            for (int j = 0; j < Tablero::ANCHO; ++j) {
-                if (tablero.matriz[i][j]) {
-                    sf::RectangleShape block(sf::Vector2f(BLOCK_SIZE-4, BLOCK_SIZE-4)); // Bloques más pequeños para simular píxeles
+            // Dibuja el tablero with un color uniforme para las piezas fijadas
+            for (int i = 0; i < Tablero::ALTO; ++i) {
+                for (int j = 0; j < Tablero::ANCHO; ++j) {
+                    if (tablero.matriz[i][j]) {
+                        sf::RectangleShape block(sf::Vector2f(BLOCK_SIZE-4, BLOCK_SIZE-4)); // Bloques más pequeños para simular píxeles
 
-                    // Asignar un color uniforme para las piezas fijadas
-                    block.setFillColor(sf::Color(128, 128, 128)); // Gris metálico
+                        // Asignar un color uniforme para las piezas fijadas
+                        block.setFillColor(sf::Color(128, 128, 128)); // Gris metálico
 
-                    // Agregar un borde grueso negro para un efecto retro
-                    block.setOutlineThickness(2);
-                    block.setOutlineColor(sf::Color::Black);
+                        // Agregar un borde grueso negro para un efecto retro
+                        block.setOutlineThickness(2);
+                        block.setOutlineColor(sf::Color::Black);
 
-                    block.setPosition(j * BLOCK_SIZE + 2, i * BLOCK_SIZE + 2);
-                    ventana.getWindow().draw(block);
+                        block.setPosition(j * BLOCK_SIZE + 2, i * BLOCK_SIZE + 2);
+                        ventana.getWindow().draw(block);
 
-                    // Agregar brillo pixelado en la esquina superior izquierda
-                    sf::RectangleShape brillo(sf::Vector2f((BLOCK_SIZE-4) / 4, (BLOCK_SIZE-4) / 4));
-                    brillo.setFillColor(sf::Color(255, 255, 255, 150)); // Color blanco translúcido para el brillo
-                    brillo.setPosition(j * BLOCK_SIZE + 2, i * BLOCK_SIZE + 2);
-                    ventana.getWindow().draw(brillo);
+                        // Agregar brillo pixelado en la esquina superior izquierda
+                        sf::RectangleShape brillo(sf::Vector2f((BLOCK_SIZE-4) / 4, (BLOCK_SIZE-4) / 4));
+                        brillo.setFillColor(sf::Color(255, 255, 255, 150)); // Color blanco translúcido para el brillo
+                        brillo.setPosition(j * BLOCK_SIZE + 2, i * BLOCK_SIZE + 2);
+                        ventana.getWindow().draw(brillo);
+                    }
                 }
             }
-        }
 
-        // Dibuja la pieza actual con un estilo retro arcade y brillo pixelado
-        for (size_t i = 0; i < piezaActual->forma.size(); ++i)
-            for (size_t j = 0; j < piezaActual->forma[0].size(); ++j)
-                if (piezaActual->forma[i][j]) {
-                    sf::RectangleShape block(sf::Vector2f(BLOCK_SIZE-4, BLOCK_SIZE-4)); // Bloques más pequeños para simular píxeles
+            // Dibuja la pieza actual con un estilo retro arcade y brillo pixelado
+            for (size_t i = 0; i < piezaActual->forma.size(); ++i)
+                for (size_t j = 0; j < piezaActual->forma[0].size(); ++j)
+                    if (piezaActual->forma[i][j]) {
+                        sf::RectangleShape block(sf::Vector2f(BLOCK_SIZE-4, BLOCK_SIZE-4)); // Bloques más pequeños para simular píxeles
 
-                    // Asignar colores sólidos brillantes para un estilo retro arcade
-                    switch (piezaActual->tipo) {
-                        case 0: block.setFillColor(sf::Color::Cyan); break;    // I - Cyan
-                        case 1: block.setFillColor(sf::Color::Yellow); break;  // O - Amarillo
-                        case 2: block.setFillColor(sf::Color::Magenta); break; // T - Magenta
-                        case 3: block.setFillColor(sf::Color::Green); break;   // S - Verde
-                        case 4: block.setFillColor(sf::Color::Red); break;     // Z - Rojo
-                        case 5: block.setFillColor(sf::Color::Blue); break;    // J - Azul
-                        case 6: block.setFillColor(sf::Color(255,140,0)); break; // L - Naranja
-                        default: block.setFillColor(sf::Color::White); break;  // Blanco
+                        // Asignar colores sólidos brillantes para un estilo retro arcade
+                        switch (piezaActual->tipo) {
+                            case 0: block.setFillColor(sf::Color::Cyan); break;    // I - Cyan
+                            case 1: block.setFillColor(sf::Color::Yellow); break;  // O - Amarillo
+                            case 2: block.setFillColor(sf::Color::Magenta); break; // T - Magenta
+                            case 3: block.setFillColor(sf::Color::Green); break;   // S - Verde
+                            case 4: block.setFillColor(sf::Color::Red); break;     // Z - Rojo
+                            case 5: block.setFillColor(sf::Color::Blue); break;    // J - Azul
+                            case 6: block.setFillColor(sf::Color(255,140,0)); break; // L - Naranja
+                            default: block.setFillColor(sf::Color::White); break;  // Blanco
+                        }
+
+                        // Agregar un borde grueso negro para un efecto retro
+                        block.setOutlineThickness(2);
+                        block.setOutlineColor(sf::Color::Black);
+
+                        block.setPosition((piezaActual->x + j) * BLOCK_SIZE + 2, (piezaActual->y + i) * BLOCK_SIZE + 2);
+                        ventana.getWindow().draw(block);
+
+                        // Agregar brillo pixelado en la esquina superior izquierda
+                        sf::RectangleShape brillo(sf::Vector2f((BLOCK_SIZE-4) / 4, (BLOCK_SIZE-4) / 4));
+                        brillo.setFillColor(sf::Color(255, 255, 255, 150)); // Color blanco translúcido para el brillo
+                        brillo.setPosition((piezaActual->x + j) * BLOCK_SIZE + 2, (piezaActual->y + i) * BLOCK_SIZE + 2);
+                        ventana.getWindow().draw(brillo);
                     }
 
-                    // Agregar un borde grueso negro para un efecto retro
-                    block.setOutlineThickness(2);
-                    block.setOutlineColor(sf::Color::Black);
+            // Agregar un recuadro a la derecha del tablero
+            sf::RectangleShape recuadroDerecho(sf::Vector2f(6 * BLOCK_SIZE, Tablero::ALTO * BLOCK_SIZE));
+            recuadroDerecho.setFillColor(sf::Color(0, 0, 0, 150)); // Fondo negro translúcido
+            recuadroDerecho.setOutlineThickness(2);
+            recuadroDerecho.setOutlineColor(sf::Color::White);
+            recuadroDerecho.setPosition(Tablero::ANCHO * BLOCK_SIZE, 0);
+            ventana.getWindow().draw(recuadroDerecho);
 
-                    block.setPosition((piezaActual->x + j) * BLOCK_SIZE + 2, (piezaActual->y + i) * BLOCK_SIZE + 2);
-                    ventana.getWindow().draw(block);
+            // Cargar la fuente Arial desde la ruta correcta
+            sf::Font fuente;
+            if (!fuente.loadFromFile("assets/fonts/Pixel.ttf")) {
+                std::cerr << "Error: No se pudo cargar la fuente Pixel desde 'assets/fonts/Pixel.ttf'. Verifica que el archivo exista y sea válido." << std::endl;
+                return; // Salir si no se puede cargar la fuente
+            }
 
-                    // Agregar brillo pixelado en la esquina superior izquierda
-                    sf::RectangleShape brillo(sf::Vector2f((BLOCK_SIZE-4) / 4, (BLOCK_SIZE-4) / 4));
-                    brillo.setFillColor(sf::Color(255, 255, 255, 150)); // Color blanco translúcido para el brillo
-                    brillo.setPosition((piezaActual->x + j) * BLOCK_SIZE + 2, (piezaActual->y + i) * BLOCK_SIZE + 2);
-                    ventana.getWindow().draw(brillo);
+            // Configurar y dibujar el texto 'PUNTOS'
+            sf::Text textoPuntos;
+            textoPuntos.setFont(fuente);
+            textoPuntos.setString("PUNTOS");
+            textoPuntos.setCharacterSize(32); // Incrementar el tamaño de letra
+            textoPuntos.setFillColor(sf::Color::White); // Color blanco
+            textoPuntos.setStyle(sf::Text::Bold); // Negrita
+            textoPuntos.setPosition(Tablero::ANCHO * BLOCK_SIZE + BLOCK_SIZE + 3, BLOCK_SIZE + 63); // Ajuste de posición para mayor visibilidad
+
+            // Dibujar el texto 'PUNTOS'
+            ventana.getWindow().draw(textoPuntos);
+
+            // Dibujar un recuadro pequeño más abajo del letrero de "PUNTOS"
+            sf::RectangleShape recuadro(sf::Vector2f(120, 120)); // Tamaño del recuadro
+            recuadro.setFillColor(sf::Color(30, 30, 30)); // Color de fondo
+            recuadro.setOutlineThickness(2);
+            recuadro.setOutlineColor(sf::Color::White); // Borde blanco
+            recuadro.setPosition(Tablero::ANCHO * BLOCK_SIZE + BLOCK_SIZE + 10, 300); // Posición más abajo sin cambiar horizontalmente
+            ventana.getWindow().draw(recuadro);
+
+            // Dibujar un recuadro para mostrar los puntos acumulados
+            sf::RectangleShape recuadroPuntos(sf::Vector2f(120, 50)); // Tamaño del recuadro
+            recuadroPuntos.setFillColor(sf::Color(30, 30, 30)); // Color de fondo
+            recuadroPuntos.setOutlineThickness(2);
+            recuadroPuntos.setOutlineColor(sf::Color::White); // Borde blanco
+            recuadroPuntos.setPosition(Tablero::ANCHO * BLOCK_SIZE + BLOCK_SIZE + 10, BLOCK_SIZE + 120); // Posición debajo del texto 'PUNTOS'
+            ventana.getWindow().draw(recuadroPuntos);
+
+            // Configurar y dibujar el texto de los puntos acumulados
+            sf::Text textoAcumulado;
+            textoAcumulado.setFont(fuente);
+            textoAcumulado.setString(std::to_string(puntaje)); // Mostrar el puntaje actual
+            textoAcumulado.setCharacterSize(24); // Tamaño de letra
+            textoAcumulado.setFillColor(sf::Color::White); // Color blanco
+            textoAcumulado.setStyle(sf::Text::Bold); // Negrita
+            textoAcumulado.setPosition(Tablero::ANCHO * BLOCK_SIZE + BLOCK_SIZE + 40, BLOCK_SIZE + 130); // Posición dentro del recuadro
+
+            // Dibujar el texto de los puntos acumulados
+            ventana.getWindow().draw(textoAcumulado);
+
+            // Configurar y dibujar el texto 'SIG PIEZA'
+            sf::Text textoSigPieza;
+            textoSigPieza.setFont(fuente);
+            textoSigPieza.setString("SIG PIEZA");
+            textoSigPieza.setCharacterSize(24); // Tamaño de letra
+            textoSigPieza.setFillColor(sf::Color::White); // Color blanco
+            textoSigPieza.setStyle(sf::Text::Bold); // Negrita
+            textoSigPieza.setPosition(Tablero::ANCHO * BLOCK_SIZE + BLOCK_SIZE + 5, 250); // Posición arriba del recuadro
+
+            // Dibujar el texto 'SIG PIEZA'
+            ventana.getWindow().draw(textoSigPieza);
+
+            // Configurar y dibujar el texto 'NIVEL'
+            sf::Text textoNivel;
+            textoNivel.setFont(fuente);
+            textoNivel.setString("NIVEL");
+            textoNivel.setCharacterSize(24); // Tamaño de letra
+            textoNivel.setFillColor(sf::Color::White); // Color blanco
+            textoNivel.setStyle(sf::Text::Bold); // Negrita
+            textoNivel.setPosition(Tablero::ANCHO * BLOCK_SIZE + BLOCK_SIZE + 40, 463); // Posición adecuada
+
+            // Dibujar el texto 'NIVEL'
+            ventana.getWindow().draw(textoNivel);
+
+            // Configurar y dibujar el texto del nivel actual
+            sf::Text textoNivelActual;
+            textoNivelActual.setFont(fuente);
+            textoNivelActual.setString(std::to_string(nivel)); // Mostrar el nivel actual
+            textoNivelActual.setCharacterSize(24); // Tamaño de letra
+            textoNivelActual.setFillColor(sf::Color::White); // Color blanco
+            textoNivelActual.setStyle(sf::Text::Bold); // Negrita
+            textoNivelActual.setPosition(Tablero::ANCHO * BLOCK_SIZE + BLOCK_SIZE + 63.5, 512); // Posición debajo del texto 'NIVEL'
+
+            // Dibujar el texto del nivel actual
+            ventana.getWindow().draw(textoNivelActual);
+
+            // Dibujar la próxima pieza
+            dibujarProximaPieza();
+
+            ventana.mostrar();
+        } else {
+            // Cargar la fuente si no está cargada
+            sf::Font fuente;
+            if (!fuente.loadFromFile("assets/fonts/Pixel.ttf")) {
+                std::cerr << "Error: No se pudo cargar la fuente Pixel desde 'assets/fonts/Pixel.ttf'. Verifica que el archivo exista y sea válido." << std::endl;
+                return;
+            }
+
+            if (enPausa) {
+                // Mostrar un mensaje de pausa con opciones
+                sf::Text textoPausa;
+                textoPausa.setFont(fuente); // Asegúrate de que la fuente esté cargada
+                textoPausa.setString("   PAUSE\n\n\nCONTINUAR\n\n Reiniciar");
+                textoPausa.setCharacterSize(30);
+                textoPausa.setFillColor(sf::Color::White);
+                textoPausa.setStyle(sf::Text::Bold);
+                textoPausa.setPosition(ventana.getWindow().getSize().x / 2 - 100, ventana.getWindow().getSize().y / 2 - 75);
+
+                // Centrar el texto de pausa dentro de la ventana
+                sf::Vector2u tamanoVentana = ventana.getWindow().getSize();
+                sf::FloatRect boundsTexto = textoPausa.getLocalBounds();
+                textoPausa.setOrigin(boundsTexto.width / 2, boundsTexto.height / 2);
+                textoPausa.setPosition(tamanoVentana.x / 2, tamanoVentana.y / 2);
+
+                // Dibujar el texto de pausa
+                ventana.getWindow().clear(); // Limpiar la ventana antes de dibujar
+                ventana.getWindow().draw(textoPausa);
+                ventana.getWindow().display(); // Mostrar el contenido dibujado
+
+                // Pausar el bucle hasta que se reanude
+                while (enPausa) {
+                    sf::Event eventoPausa;
+                    while (ventana.obtenerEvento(eventoPausa)) {
+                        if (eventoPausa.type == sf::Event::KeyPressed && eventoPausa.key.code == sf::Keyboard::Q) {
+                            enPausa = false; // Reanudar el juego
+                        }
+                    }
                 }
-
-        // Agregar un recuadro a la derecha del tablero
-        sf::RectangleShape recuadroDerecho(sf::Vector2f(6 * BLOCK_SIZE, Tablero::ALTO * BLOCK_SIZE));
-        recuadroDerecho.setFillColor(sf::Color(0, 0, 0, 150)); // Fondo negro translúcido
-        recuadroDerecho.setOutlineThickness(2);
-        recuadroDerecho.setOutlineColor(sf::Color::White);
-        recuadroDerecho.setPosition(Tablero::ANCHO * BLOCK_SIZE, 0);
-        ventana.getWindow().draw(recuadroDerecho);
-
-        // Cargar la fuente Arial desde la ruta correcta
-        sf::Font fuente;
-        if (!fuente.loadFromFile("assets/fonts/Pixel.ttf")) {
-            std::cerr << "Error: No se pudo cargar la fuente Pixel desde 'assets/fonts/Pixel.ttf'. Verifica que el archivo exista y sea válido." << std::endl;
-            return; // Salir si no se puede cargar la fuente
+            }
         }
-
-        // Configurar y dibujar el texto 'PUNTOS'
-        sf::Text textoPuntos;
-        textoPuntos.setFont(fuente);
-        textoPuntos.setString("PUNTOS");
-        textoPuntos.setCharacterSize(32); // Incrementar el tamaño de letra
-        textoPuntos.setFillColor(sf::Color::White); // Color blanco
-        textoPuntos.setStyle(sf::Text::Bold); // Negrita
-        textoPuntos.setPosition(Tablero::ANCHO * BLOCK_SIZE + BLOCK_SIZE + 3, BLOCK_SIZE + 63); // Ajuste de posición para mayor visibilidad
-
-        // Dibujar el texto 'PUNTOS'
-        ventana.getWindow().draw(textoPuntos);
-
-        // Dibujar un recuadro pequeño más abajo del letrero de "PUNTOS"
-        sf::RectangleShape recuadro(sf::Vector2f(120, 120)); // Tamaño del recuadro
-        recuadro.setFillColor(sf::Color(30, 30, 30)); // Color de fondo
-        recuadro.setOutlineThickness(2);
-        recuadro.setOutlineColor(sf::Color::White); // Borde blanco
-        recuadro.setPosition(Tablero::ANCHO * BLOCK_SIZE + BLOCK_SIZE + 10, 300); // Posición más abajo sin cambiar horizontalmente
-        ventana.getWindow().draw(recuadro);
-
-        // Dibujar un recuadro para mostrar los puntos acumulados
-        sf::RectangleShape recuadroPuntos(sf::Vector2f(120, 50)); // Tamaño del recuadro
-        recuadroPuntos.setFillColor(sf::Color(30, 30, 30)); // Color de fondo
-        recuadroPuntos.setOutlineThickness(2);
-        recuadroPuntos.setOutlineColor(sf::Color::White); // Borde blanco
-        recuadroPuntos.setPosition(Tablero::ANCHO * BLOCK_SIZE + BLOCK_SIZE + 10, BLOCK_SIZE + 120); // Posición debajo del texto 'PUNTOS'
-        ventana.getWindow().draw(recuadroPuntos);
-
-        // Configurar y dibujar el texto de los puntos acumulados
-        sf::Text textoAcumulado;
-        textoAcumulado.setFont(fuente);
-        textoAcumulado.setString(std::to_string(puntaje)); // Mostrar el puntaje actual
-        textoAcumulado.setCharacterSize(24); // Tamaño de letra
-        textoAcumulado.setFillColor(sf::Color::White); // Color blanco
-        textoAcumulado.setStyle(sf::Text::Bold); // Negrita
-        textoAcumulado.setPosition(Tablero::ANCHO * BLOCK_SIZE + BLOCK_SIZE + 60, BLOCK_SIZE + 130); // Posición dentro del recuadro
-
-        // Dibujar el texto de los puntos acumulados
-        ventana.getWindow().draw(textoAcumulado);
-
-        // Configurar y dibujar el texto 'SIG PIEZA'
-        sf::Text textoSigPieza;
-        textoSigPieza.setFont(fuente);
-        textoSigPieza.setString("SIG PIEZA");
-        textoSigPieza.setCharacterSize(24); // Tamaño de letra
-        textoSigPieza.setFillColor(sf::Color::White); // Color blanco
-        textoSigPieza.setStyle(sf::Text::Bold); // Negrita
-        textoSigPieza.setPosition(Tablero::ANCHO * BLOCK_SIZE + BLOCK_SIZE + 5, 250); // Posición arriba del recuadro
-
-        // Dibujar el texto 'SIG PIEZA'
-        ventana.getWindow().draw(textoSigPieza);
-
-        // Configurar y dibujar el texto 'NIVEL'
-        sf::Text textoNivel;
-        textoNivel.setFont(fuente);
-        textoNivel.setString("NIVEL");
-        textoNivel.setCharacterSize(24); // Tamaño de letra
-        textoNivel.setFillColor(sf::Color::White); // Color blanco
-        textoNivel.setStyle(sf::Text::Bold); // Negrita
-        textoNivel.setPosition(Tablero::ANCHO * BLOCK_SIZE + BLOCK_SIZE + 40, 463); // Posición adecuada
-
-        // Dibujar el texto 'NIVEL'
-        ventana.getWindow().draw(textoNivel);
-
-        // Configurar y dibujar el texto del nivel actual
-        sf::Text textoNivelActual;
-        textoNivelActual.setFont(fuente);
-        textoNivelActual.setString(std::to_string(nivel)); // Mostrar el nivel actual
-        textoNivelActual.setCharacterSize(24); // Tamaño de letra
-        textoNivelActual.setFillColor(sf::Color::White); // Color blanco
-        textoNivelActual.setStyle(sf::Text::Bold); // Negrita
-        textoNivelActual.setPosition(Tablero::ANCHO * BLOCK_SIZE + BLOCK_SIZE + 63.5, 512); // Posición debajo del texto 'NIVEL'
-
-        // Dibujar el texto del nivel actual
-        ventana.getWindow().draw(textoNivelActual);
-
-        // Dibujar la próxima pieza
-        dibujarProximaPieza();
-
-        ventana.mostrar();
     }
     if (piezaActual) delete piezaActual;
 
