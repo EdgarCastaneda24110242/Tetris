@@ -18,25 +18,28 @@ Juego::Juego(sf::RenderWindow& ventanaPrincipal)
         // Eliminado mensaje de error para evitar spam en la terminal
     }
 
-    // Reproducir música de fondo
-    musica.reproducir(); // No mostrar mensajes en terminal
+    // Cargar la fuente Pixel.ttf una sola vez para toda la UI
+    if (!fuente.loadFromFile("assets/fonts/Pixel.ttf")) {
+        std::cerr << "Error: No se pudo cargar la fuente Pixel.ttf" << std::endl;
+    }
+
+    // No reproducir música aquí, solo cuando empiece el juego
 }
 
 void Juego::nuevaPieza() {
-    if (piezaActual) delete piezaActual;
+    // Asignar la próxima pieza como actual (sin liberar memoria aquí)
     piezaActual = proximaPieza;
-
-    if (piezaActual) { // Validar que piezaActual no sea nullptr
-        piezaActual->x = 3; 
+    // Crear una nueva próxima pieza
+    proximaPieza = new Pieza(rand() % 7);
+    // Inicializar posición de la pieza actual
+    if (piezaActual) {
+        piezaActual->x = 3;
         piezaActual->y = 0;
         if (tablero.colision(*piezaActual)) gameOver = true;
     } else {
-        // std::cerr << "Error: piezaActual es nullptr después de asignar proximaPieza." << std::endl;
         gameOver = true;
         return;
     }
-
-    proximaPieza = new Pieza(rand() % 7); // Genera una nueva próxima pieza
 }
 
 void Juego::dibujarProximaPieza() {
@@ -72,39 +75,55 @@ void Juego::dibujarProximaPieza() {
 // Método para dibujar el menú de pausa de forma clara y reutilizable
 void Juego::dibujarMenuPausa(sf::RenderWindow& window, const sf::Font& fuente) {
     sf::Vector2u tamanoVentana = window.getSize();
-    // Título "PAUSA"
-    sf::Text tituloPausa;
-    tituloPausa.setFont(fuente);
-    tituloPausa.setString("PAUSA");
-    tituloPausa.setCharacterSize(60);
-    tituloPausa.setFillColor(sf::Color::Red);
-    tituloPausa.setStyle(sf::Text::Bold);
-    sf::FloatRect boundsTitulo = tituloPausa.getLocalBounds();
-    tituloPausa.setOrigin(boundsTitulo.width / 2, boundsTitulo.height / 2);
-    tituloPausa.setPosition(tamanoVentana.x / 2 - 80, tamanoVentana.y / 2 - 80);
-    window.draw(tituloPausa);
+    int centroX = tamanoVentana.x / 2 - 80; // Ajuste a la derecha
+    // Título "PAUSA" con fuente especial
+    sf::Font fuenteTetrominoes;
+    if (fuenteTetrominoes.loadFromFile("assets/fonts/tetrominoes.ttf")) {
+        sf::Text titulo;
+        titulo.setFont(fuenteTetrominoes);
+        titulo.setString("PAUSA");
+        titulo.setCharacterSize(52);
+        titulo.setFillColor(sf::Color::Red);
+        titulo.setStyle(sf::Text::Bold);
+        sf::FloatRect boundsTitulo = titulo.getLocalBounds();
+        titulo.setOrigin(boundsTitulo.width / 2, boundsTitulo.height / 2);
+        titulo.setPosition(centroX, tamanoVentana.y / 2 - 80);
+        window.draw(titulo);
+    } else {
+        std::cerr << "No se pudo cargar tetrominoes.ttf, usando fuente por defecto para PAUSA" << std::endl;
+        sf::Text titulo;
+        titulo.setFont(fuente);
+        titulo.setString("PAUSA");
+        titulo.setCharacterSize(52);
+        titulo.setFillColor(sf::Color::Red);
+        titulo.setStyle(sf::Text::Bold);
+        sf::FloatRect boundsTitulo = titulo.getLocalBounds();
+        titulo.setOrigin(boundsTitulo.width / 2, boundsTitulo.height / 2);
+        titulo.setPosition(centroX, tamanoVentana.y / 2 - 80);
+        window.draw(titulo);
+    }
     // Opción Reanudar
-    sf::Text opcionContinuar;
-    opcionContinuar.setFont(fuente);
-    opcionContinuar.setString("[Q] Reanudar");
-    opcionContinuar.setCharacterSize(32);
-    opcionContinuar.setFillColor(sf::Color::White);
-    opcionContinuar.setStyle(sf::Text::Bold);
-    sf::FloatRect boundsCont = opcionContinuar.getLocalBounds();
-    opcionContinuar.setOrigin(boundsCont.width / 2, boundsCont.height / 2);
-    opcionContinuar.setPosition(tamanoVentana.x / 2 - 80, tamanoVentana.y / 2 + 10);
-    window.draw(opcionContinuar);
+    sf::Text reanudar;
+    reanudar.setFont(fuente);
+    reanudar.setString("[Q] Reanudar");
+    reanudar.setCharacterSize(36);
+    reanudar.setFillColor(sf::Color::White);
+    reanudar.setStyle(sf::Text::Bold);
+    sf::FloatRect boundsReanudar = reanudar.getLocalBounds();
+    reanudar.setOrigin(boundsReanudar.width / 2, boundsReanudar.height / 2);
+    reanudar.setPosition(centroX, tamanoVentana.y / 2 + 10);
+    window.draw(reanudar);
     // Opción Reiniciar
-    sf::Text opcionReiniciar;
-    opcionReiniciar.setFont(fuente);
-    opcionReiniciar.setString("[R] Reiniciar");
-    opcionReiniciar.setCharacterSize(32);
-    opcionReiniciar.setFillColor(sf::Color::White);
-    opcionReiniciar.setStyle(sf::Text::Bold);
-    sf::FloatRect boundsRein = opcionReiniciar.getLocalBounds();
-    opcionReiniciar.setOrigin(boundsRein.width / 2, boundsRein.height / 2);
-    opcionReiniciar.setPosition(tamanoVentana.x / 2 - 80, tamanoVentana.y / 2 + 60);
-    window.draw(opcionReiniciar);
+    sf::Text reiniciar;
+    reiniciar.setFont(fuente);
+    reiniciar.setString("[R] Reiniciar");
+    reiniciar.setCharacterSize(36);
+    reiniciar.setFillColor(sf::Color::White);
+    reiniciar.setStyle(sf::Text::Bold);
+    sf::FloatRect boundsReiniciar = reiniciar.getLocalBounds();
+    reiniciar.setOrigin(boundsReiniciar.width / 2, boundsReiniciar.height / 2);
+    reiniciar.setPosition(centroX, tamanoVentana.y / 2 + 60);
+    window.draw(reiniciar);
 }
 
 void Juego::dibujarUILateral(int puntaje, int nivel, sf::Font& fuente) {
@@ -178,7 +197,103 @@ void Juego::dibujarUILateral(int puntaje, int nivel, sf::Font& fuente) {
     dibujarProximaPieza();
 }
 
+void Juego::mostrarMenuPrincipal() {
+    bool enMenu = true;
+    int opcionSeleccionada = 0;
+    std::vector<std::string> opciones = {"Jugar", "Scores", "Salir"};
+    sf::Font fuenteTetrominoes;
+    fuenteTetrominoes.loadFromFile("assets/fonts/tetrominoes.ttf");
+    Musica musicaMenu("assets/music/TetrisMenu.ogg");
+    musicaMenu.setVolume(10); // Volumen bajo para el menú principal
+    musicaMenu.reproducir();
+    while (enMenu && ventana.estaAbierta()) {
+        ventana.getWindow().clear();
+        // Título con fuente tetrominoes
+        sf::Text titulo;
+        if (fuenteTetrominoes.getInfo().family != "") {
+            titulo.setFont(fuenteTetrominoes);
+        } else {
+            titulo.setFont(fuente);
+        }
+        titulo.setString("TETRIS");
+        titulo.setCharacterSize(60);
+        titulo.setFillColor(sf::Color::Red);
+        titulo.setStyle(sf::Text::Bold);
+        sf::FloatRect boundsTitulo = titulo.getLocalBounds();
+        titulo.setOrigin(boundsTitulo.width / 2, boundsTitulo.height / 2);
+        titulo.setPosition(ventana.getWindow().getSize().x / 2, 120);
+        ventana.getWindow().draw(titulo);
+        // Subtítulo "by Fer and Edgar" con fuente Pixel.ttf
+        sf::Text subtitulo;
+        subtitulo.setFont(fuente);
+        subtitulo.setString("by Fer and Edgar");
+        subtitulo.setCharacterSize(24);
+        subtitulo.setFillColor(sf::Color::White);
+        subtitulo.setStyle(sf::Text::Bold);
+        sf::FloatRect boundsSub = subtitulo.getLocalBounds();
+        subtitulo.setOrigin(boundsSub.width / 2, boundsSub.height / 2);
+        subtitulo.setPosition(ventana.getWindow().getSize().x / 2, 170);
+        ventana.getWindow().draw(subtitulo);
+        // Opciones
+        for (size_t i = 0; i < opciones.size(); ++i) {
+            sf::Text opcion;
+            opcion.setFont(fuente);
+            opcion.setString(opciones[i]);
+            opcion.setCharacterSize(36);
+            opcion.setFillColor(i == opcionSeleccionada ? sf::Color::Yellow : sf::Color::White);
+            opcion.setStyle(sf::Text::Bold);
+            sf::FloatRect boundsOpcion = opcion.getLocalBounds();
+            opcion.setOrigin(boundsOpcion.width / 2, boundsOpcion.height / 2);
+            opcion.setPosition(ventana.getWindow().getSize().x / 2, 250 + i * 60);
+            ventana.getWindow().draw(opcion);
+        }
+        ventana.getWindow().display();
+        // Manejo de eventos
+        sf::Event event;
+        while (ventana.obtenerEvento(event)) {
+            if (event.type == sf::Event::Closed) {
+                ventana.getWindow().close();
+                return;
+            }
+            if (event.type == sf::Event::KeyPressed) {
+                if (event.key.code == sf::Keyboard::Up || event.key.code == sf::Keyboard::W) {
+                    opcionSeleccionada = (opcionSeleccionada + opciones.size() - 1) % opciones.size();
+                } else if (event.key.code == sf::Keyboard::Down || event.key.code == sf::Keyboard::S) {
+                    opcionSeleccionada = (opcionSeleccionada + 1) % opciones.size();
+                } else if (event.key.code == sf::Keyboard::Enter || event.key.code == sf::Keyboard::Return) {
+                    if (opcionSeleccionada == 0) {
+                        // Reproducir sonido de empezar juego SOLO aquí
+                        Audio sonidoInicio("assets/music/EmpezarJuego.ogg");
+                        sonidoInicio.setVolume(20);
+                        sonidoInicio.reproducir();
+                        sf::sleep(sf::seconds(1.0f));
+                        enMenu = false; // Jugar
+                    } else if (opcionSeleccionada == 1) {
+                        sf::Text scores;
+                        scores.setFont(fuente);
+                        scores.setString("No implementado");
+                        scores.setCharacterSize(32);
+                        scores.setFillColor(sf::Color::White);
+                        scores.setPosition(ventana.getWindow().getSize().x / 2 - 100, 450);
+                        ventana.getWindow().draw(scores);
+                        ventana.getWindow().display();
+                        sf::sleep(sf::seconds(1.5f));
+                    } else if (opcionSeleccionada == 2) {
+                        ventana.getWindow().close();
+                        return;
+                    }
+                }
+            }
+        }
+    }
+    musicaMenu.detener();
+    musica.setVolume(20); // Restaurar volumen normal al salir del menú
+}
+
 void Juego::jugar() {
+    mostrarMenuPrincipal();
+    musica.detener(); // Detener cualquier música previa (incluida la del menú)
+    musica.reproducir(); // Iniciar la música de fondo del juego
     // Crear un objeto de sonido para MovePieza
     Audio sonidoMover("assets/music/MovePieza.ogg");
     sonidoMover.setVolume(18); // Reducir el volumen tres veces más
@@ -195,9 +310,9 @@ void Juego::jugar() {
 
     nuevaPieza();
 
-    // Reproducir el sonido de inicio del juego
-    Audio sonidoInicio("assets/music/EmpezarJuego.ogg");
-    sonidoInicio.reproducir(); // No mostrar mensajes en terminal
+    // Eliminar la reproducción del sonido de inicio aquí para evitar duplicados
+    // Audio sonidoInicio("assets/music/EmpezarJuego.ogg");
+    // sonidoInicio.reproducir();
 
     // Inicializar nivel y puntaje
     int nivel = 1;
@@ -625,34 +740,15 @@ void Juego::jugar() {
 
             ventana.mostrar();
         } else {
-            // Cargar la fuente si no está cargada
-            sf::Font fuente;
-            fuente.loadFromFile("assets/fonts/Pixel.ttf"); // No mostrar mensaje de error
-
             if (enPausa) {
-                // Mostrar un mensaje de pausa con opciones
-                sf::Text textoPausa;
-                textoPausa.setFont(fuente); // Asegúrate de que la fuente esté cargada
-                textoPausa.setString("   PAUSE\n\n\nCONTINUAR\n\n Reiniciar");
-                textoPausa.setCharacterSize(30);
-                textoPausa.setFillColor(sf::Color::White);
-                textoPausa.setStyle(sf::Text::Bold);
-                textoPausa.setPosition(ventana.getWindow().getSize().x / 2 - 100, ventana.getWindow().getSize().y / 2 - 75);
-
-                // Centrar el texto de pausa dentro de la ventana
-                sf::Vector2u tamanoVentana = ventana.getWindow().getSize();
-                sf::FloatRect boundsTexto = textoPausa.getLocalBounds();
-                textoPausa.setOrigin(boundsTexto.width / 2, boundsTexto.height / 2);
-                textoPausa.setPosition(tamanoVentana.x / 2, tamanoVentana.y / 2);
-
                 // Limpiar la ventana antes de dibujar
                 ventana.getWindow().clear();
 
                 // --- Dibuja la UI lateral durante el menú de pausa ---
                 dibujarUILateral(puntaje, nivel, fuente);
 
-                // Dibujar el texto de pausa
-                ventana.getWindow().draw(textoPausa);
+                // Dibujar el menú de pausa centrado usando la fuente miembro
+                dibujarMenuPausa(ventana.getWindow(), fuente);
 
                 ventana.getWindow().display();
 
@@ -668,7 +764,15 @@ void Juego::jugar() {
             }
         }
     }
-    if (piezaActual) delete piezaActual;
+    // Liberar memoria de piezaActual y proximaPieza SOLO al final del juego
+    if (piezaActual) {
+        delete piezaActual;
+        piezaActual = nullptr;
+    }
+    if (proximaPieza) {
+        delete proximaPieza;
+        proximaPieza = nullptr;
+    }
 
     if (gameOver) {
         // Detener la música de fondo
