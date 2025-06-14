@@ -6,6 +6,18 @@
 #include <cstdlib>
 #include <iostream> // Incluir para std::cerr
 #include <fstream>  // Incluir para std::ifstream
+#include <vector>
+#include <ctime>
+
+// Estructura para bloques de fondo animados en el menú principal
+struct BloqueFondo {
+    int tipo; // 0-6
+    float x, y;
+    float velocidad;
+    float rotacion;
+    float rotacionVelocidad;
+    float opacidad;
+};
 
 Juego::Juego(sf::RenderWindow& ventanaPrincipal)
     : ventana(ventanaPrincipal), gameOver(false), musica("assets/music/Tetris.ogg") {
@@ -124,6 +136,17 @@ void Juego::dibujarMenuPausa(sf::RenderWindow& window, const sf::Font& fuente) {
     reiniciar.setOrigin(boundsReiniciar.width / 2, boundsReiniciar.height / 2);
     reiniciar.setPosition(centroX, tamanoVentana.y / 2 + 60);
     window.draw(reiniciar);
+    // Opción Salir
+    sf::Text salir;
+    salir.setFont(fuente);
+    salir.setString("[M] SALIR");
+    salir.setCharacterSize(36);
+    salir.setFillColor(sf::Color::White);
+    salir.setStyle(sf::Text::Bold);
+    sf::FloatRect boundsSalir = salir.getLocalBounds();
+    salir.setOrigin(boundsSalir.width / 2, boundsSalir.height / 2);
+    salir.setPosition(centroX, tamanoVentana.y / 2 + 110);
+    window.draw(salir);
 }
 
 void Juego::dibujarUILateral(int puntaje, int nivel, sf::Font& fuente) {
@@ -206,8 +229,83 @@ void Juego::mostrarMenuPrincipal() {
     Musica musicaMenu("assets/music/TetrisMenu.ogg");
     musicaMenu.setVolume(10); // Volumen bajo para el menú principal
     musicaMenu.reproducir();
+
+    // Inicializar generador aleatorio
+    srand(static_cast<unsigned int>(time(nullptr)));
+    // Bloques de fondo animados
+    std::vector<BloqueFondo> bloquesFondo;
+    const int piezaMaxAncho = 4 * BLOCK_SIZE; // Máximo ancho de una pieza (pieza I)
+    int numColumnas = ventana.getWindow().getSize().x / piezaMaxAncho;
+    std::vector<bool> columnasOcupadas(numColumnas, false);
+    const int numBloquesFondo = std::min(numColumnas, 18); // No más bloques que columnas
+    for (int i = 0; i < numBloquesFondo; ++i) {
+        BloqueFondo b;
+        b.tipo = rand() % 7;
+        Pieza piezaTmp(b.tipo);
+        int piezaAncho = piezaTmp.forma[0].size() * BLOCK_SIZE;
+        // Buscar columna libre
+        int col;
+        do {
+            col = rand() % numColumnas;
+        } while (columnasOcupadas[col]);
+        columnasOcupadas[col] = true;
+        b.x = col * piezaMaxAncho + rand() % (piezaMaxAncho - piezaAncho + 1);
+        b.y = static_cast<float>(rand() % ventana.getWindow().getSize().y);
+        b.velocidad = 60 + rand() % 80; // píxeles por segundo
+        b.rotacion = 0; // Sin rotación
+        b.rotacionVelocidad = 0;
+        b.opacidad = 80 + rand() % 60; // 80-140
+        b.rotacion = 0;
+        bloquesFondo.push_back(b);
+    }
+    sf::Clock clockFondo;
+
     while (enMenu && ventana.estaAbierta()) {
+        float dt = clockFondo.restart().asSeconds();
+        // Actualizar bloques de fondo
+        for (int i = 0; i < bloquesFondo.size(); ++i) {
+            auto& b = bloquesFondo[i];
+            b.y += b.velocidad * dt;
+            if (b.y > ventana.getWindow().getSize().y + 40) {
+                // Liberar columna anterior
+                int colAnterior = (int)((b.x) / piezaMaxAncho);
+                columnasOcupadas[colAnterior] = false;
+                // Resetear bloque en nueva columna libre
+                b.tipo = rand() % 7;
+                Pieza piezaTmp(b.tipo);
+                int piezaAncho = piezaTmp.forma[0].size() * BLOCK_SIZE;
+                int col;
+                do {
+                    col = rand() % numColumnas;
+                } while (columnasOcupadas[col]);
+                columnasOcupadas[col] = true;
+                b.x = col * piezaMaxAncho + rand() % (piezaMaxAncho - piezaAncho + 1);
+                b.y = -40.0f;
+                b.rotacion = 0;
+                b.rotacionVelocidad = 0;
+                b.opacidad = 80 + rand() % 60;
+            }
+        }
         ventana.getWindow().clear();
+        // Dibujar bloques de fondo
+        for (const auto& b : bloquesFondo) {
+            Pieza pieza(b.tipo);
+            for (size_t i = 0; i < pieza.forma.size(); ++i) {
+                for (size_t j = 0; j < pieza.forma[i].size(); ++j) {
+                    if (pieza.forma[i][j]) {
+                        sf::RectangleShape block(sf::Vector2f(BLOCK_SIZE-4, BLOCK_SIZE-4));
+                        block.setOrigin((BLOCK_SIZE-4)/2, (BLOCK_SIZE-4)/2);
+                        block.setPosition(b.x + j*BLOCK_SIZE, b.y + i*BLOCK_SIZE);
+                        sf::Color color = ColorPieza::obtener(b.tipo+1);
+                        color.a = static_cast<sf::Uint8>(b.opacidad);
+                        block.setFillColor(color);
+                        block.setOutlineThickness(1);
+                        block.setOutlineColor(sf::Color(0,0,0,80));
+                        ventana.getWindow().draw(block);
+                    }
+                }
+            }
+        }
         // Título con fuente tetrominoes
         sf::Text titulo;
         if (fuenteTetrominoes.getInfo().family != "") {
@@ -384,6 +482,7 @@ void Juego::jugar() {
                             nivel = 1 + puntaje / 1000;
                             delay = velocidadBase / nivel;
                             nuevaPieza();
+                            if (gameOver) break; // Salir del bucle si se pierde
                         }
                         break;
                     case Controles::Rotar:
@@ -409,8 +508,7 @@ void Juego::jugar() {
 
         if (enPausa) {
             musica.pausar();
-
-            // 1. Dibuja el estado actual del juego (tablero, piezas, UI lateral, próxima pieza)
+            // Dibuja el estado actual del juego y overlay de pausa
             ventana.limpiar();
             // Dibuja el tablero
             for (int i = 0; i < Tablero::ALTO; ++i) {
@@ -465,9 +563,10 @@ void Juego::jugar() {
             // 3. Dibuja el menú de pausa centrado
             dibujarMenuPausa(ventana.getWindow(), fuente);
             ventana.getWindow().display();
-            // Pausar el bucle hasta que se reanude o reinicie
+            // Pausar el bucle hasta que se reanude, reinicie o regrese al menú
             bool salirPausa = false;
-            while (enPausa && !salirPausa) {
+            bool regresarMenu = false;
+            while (enPausa && !salirPausa && !regresarMenu) {
                 sf::Event eventoPausa;
                 while (ventana.obtenerEvento(eventoPausa)) {
                     if (eventoPausa.type == sf::Event::KeyPressed) {
@@ -475,21 +574,36 @@ void Juego::jugar() {
                             enPausa = false; // Reanudar
                         }
                         if (eventoPausa.key.code == sf::Keyboard::R) {
-                            // Reiniciar el juego
-                            salirPausa = true;
-                            // Reinicia variables principales
+                            // Transición: pantalla negra y sonido de inicio
+                            ventana.getWindow().clear(sf::Color::Black);
+                            ventana.getWindow().display();
+                            Audio sonidoInicio("assets/music/EmpezarJuego.ogg");
+                            sonidoInicio.setVolume(20);
+                            sonidoInicio.reproducir();
+                            sf::sleep(sf::seconds(0.7f)); // Aumenta el tiempo de pantalla negra
+                            // Reiniciar la música de fondo
+                            musica.detener();
+                            musica.reproducir();
+                            // Reiniciar el juego y quitar pausa automáticamente
                             puntaje = 0;
                             nivel = 1;
                             delay = velocidadBase;
                             tablero = Tablero();
                             nuevaPieza();
+                            enPausa = false;
+                            salirPausa = true;
+                        }
+                        if (eventoPausa.key.code == sf::Keyboard::M) {
+                            ventana.getWindow().close(); // Ahora sí cerrar el juego
+                            salirPausa = true;
                         }
                     }
                 }
             }
+            if (regresarMenu) return; // Salir de jugar() y volver al menú principal
             if (salirPausa) continue; // Salta el resto del ciclo para reiniciar
         } else {
-            musica.reanudar(); // Reanudar música si se reanuda el juego;
+            musica.reanudar();
         }
 
         if (!enPausa) {
@@ -567,9 +681,9 @@ void Juego::jugar() {
                                         brillo.setPosition((piezaActual->x + j) * BLOCK_SIZE + 2, (piezaActual->y + i) * BLOCK_SIZE + 2);
                                         ventana.getWindow().draw(brillo);
                                     }
-                            // UI: recuadros, puntaje, nivel, próxima pieza
+                            // Dibuja la UI lateral y la próxima pieza
                             dibujarUILateral(puntaje, nivel, fuente);
-
+                            dibujarProximaPieza();
                             ventana.mostrar();
                             sf::sleep(sf::seconds(duracionParpadeo));
                         }
@@ -772,24 +886,5 @@ void Juego::jugar() {
     if (proximaPieza) {
         delete proximaPieza;
         proximaPieza = nullptr;
-    }
-
-    if (gameOver) {
-        // Detener la música de fondo
-        musica.detener();
-
-        // Reproducir el sonido de GameOver
-        Audio sonidoGameOver("assets/music/GameOver.ogg");
-        sonidoGameOver.reproducir(); // No mostrar mensajes en terminal
-
-        // Mostrar la pantalla de Game Over
-        GameOverScreen gameOverScreen(ventana.getWindow());
-        gameOverScreen.mostrar();
-
-        // Esperar mientras se reproduce la música de GameOver
-        while (sonidoGameOver.estaReproduciendo()) {
-            sf::sleep(sf::milliseconds(100));
-        }
-
     }
 }
