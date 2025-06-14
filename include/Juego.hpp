@@ -27,4 +27,6 @@ private:
     void nuevaPieza();
     void actualizarPuntaje();
     void dibujarProximaPieza(); // Declaración de la función para dibujar la próxima pieza
+    void dibujarMenuPausa(sf::RenderWindow& window, const sf::Font& fuente); // Menú de pausa centralizado
+    void dibujarUILateral(int puntaje, int nivel, sf::Font& fuente);
 };

@@ -15,11 +15,11 @@ Juego::Juego(sf::RenderWindow& ventanaPrincipal)
 
     // Cargar textura para las piezas
     if (!texturaPiezas.loadFromFile("assets/textures/piezas_pixelart.png")) {
-        std::cerr << "Error: No se pudo cargar la textura de las piezas." << std::endl;
+        // Eliminado mensaje de error para evitar spam en la terminal
     }
 
     // Reproducir música de fondo
-    musica.reproducir();
+    musica.reproducir(); // No mostrar mensajes en terminal
 }
 
 void Juego::nuevaPieza() {
@@ -31,7 +31,7 @@ void Juego::nuevaPieza() {
         piezaActual->y = 0;
         if (tablero.colision(*piezaActual)) gameOver = true;
     } else {
-        std::cerr << "Error: piezaActual es nullptr después de asignar proximaPieza." << std::endl;
+        // std::cerr << "Error: piezaActual es nullptr después de asignar proximaPieza." << std::endl;
         gameOver = true;
         return;
     }
@@ -69,6 +69,115 @@ void Juego::dibujarProximaPieza() {
     }
 }
 
+// Método para dibujar el menú de pausa de forma clara y reutilizable
+void Juego::dibujarMenuPausa(sf::RenderWindow& window, const sf::Font& fuente) {
+    sf::Vector2u tamanoVentana = window.getSize();
+    // Título "PAUSA"
+    sf::Text tituloPausa;
+    tituloPausa.setFont(fuente);
+    tituloPausa.setString("PAUSA");
+    tituloPausa.setCharacterSize(60);
+    tituloPausa.setFillColor(sf::Color::Red);
+    tituloPausa.setStyle(sf::Text::Bold);
+    sf::FloatRect boundsTitulo = tituloPausa.getLocalBounds();
+    tituloPausa.setOrigin(boundsTitulo.width / 2, boundsTitulo.height / 2);
+    tituloPausa.setPosition(tamanoVentana.x / 2 - 80, tamanoVentana.y / 2 - 80);
+    window.draw(tituloPausa);
+    // Opción Reanudar
+    sf::Text opcionContinuar;
+    opcionContinuar.setFont(fuente);
+    opcionContinuar.setString("[Q] Reanudar");
+    opcionContinuar.setCharacterSize(32);
+    opcionContinuar.setFillColor(sf::Color::White);
+    opcionContinuar.setStyle(sf::Text::Bold);
+    sf::FloatRect boundsCont = opcionContinuar.getLocalBounds();
+    opcionContinuar.setOrigin(boundsCont.width / 2, boundsCont.height / 2);
+    opcionContinuar.setPosition(tamanoVentana.x / 2 - 80, tamanoVentana.y / 2 + 10);
+    window.draw(opcionContinuar);
+    // Opción Reiniciar
+    sf::Text opcionReiniciar;
+    opcionReiniciar.setFont(fuente);
+    opcionReiniciar.setString("[R] Reiniciar");
+    opcionReiniciar.setCharacterSize(32);
+    opcionReiniciar.setFillColor(sf::Color::White);
+    opcionReiniciar.setStyle(sf::Text::Bold);
+    sf::FloatRect boundsRein = opcionReiniciar.getLocalBounds();
+    opcionReiniciar.setOrigin(boundsRein.width / 2, boundsRein.height / 2);
+    opcionReiniciar.setPosition(tamanoVentana.x / 2 - 80, tamanoVentana.y / 2 + 60);
+    window.draw(opcionReiniciar);
+}
+
+void Juego::dibujarUILateral(int puntaje, int nivel, sf::Font& fuente) {
+    // Recuadro derecho
+    sf::RectangleShape recuadroDerecho(sf::Vector2f(6 * BLOCK_SIZE, Tablero::ALTO * BLOCK_SIZE));
+    recuadroDerecho.setFillColor(sf::Color(0, 0, 0, 210));
+    recuadroDerecho.setOutlineThickness(2);
+    recuadroDerecho.setOutlineColor(sf::Color::White);
+    recuadroDerecho.setPosition(Tablero::ANCHO * BLOCK_SIZE, 0);
+    ventana.getWindow().draw(recuadroDerecho);
+    // Texto PUNTOS
+    sf::Text textoPuntos;
+    textoPuntos.setFont(fuente);
+    textoPuntos.setString("PUNTOS");
+    textoPuntos.setCharacterSize(32);
+    textoPuntos.setFillColor(sf::Color::White);
+    textoPuntos.setStyle(sf::Text::Bold);
+    textoPuntos.setPosition(Tablero::ANCHO * BLOCK_SIZE + BLOCK_SIZE + 3, BLOCK_SIZE + 63);
+    ventana.getWindow().draw(textoPuntos);
+    // Recuadro pequeño debajo de PUNTOS
+    sf::RectangleShape recuadro(sf::Vector2f(120, 120));
+    recuadro.setFillColor(sf::Color(30, 30, 30));
+    recuadro.setOutlineThickness(2);
+    recuadro.setOutlineColor(sf::Color::White);
+    recuadro.setPosition(Tablero::ANCHO * BLOCK_SIZE + BLOCK_SIZE + 10, 300);
+    ventana.getWindow().draw(recuadro);
+    // Recuadro de puntos acumulados
+    sf::RectangleShape recuadroPuntos(sf::Vector2f(120, 50));
+    recuadroPuntos.setFillColor(sf::Color(30, 30, 30));
+    recuadroPuntos.setOutlineThickness(2);
+    recuadroPuntos.setOutlineColor(sf::Color::White);
+    recuadroPuntos.setPosition(Tablero::ANCHO * BLOCK_SIZE + BLOCK_SIZE + 10, BLOCK_SIZE + 120);
+    ventana.getWindow().draw(recuadroPuntos);
+    // Texto de puntos acumulados
+    sf::Text textoAcumulado;
+    textoAcumulado.setFont(fuente);
+    textoAcumulado.setString(std::to_string(puntaje));
+    textoAcumulado.setCharacterSize(24);
+    textoAcumulado.setFillColor(sf::Color::White);
+    textoAcumulado.setStyle(sf::Text::Bold);
+    textoAcumulado.setPosition(Tablero::ANCHO * BLOCK_SIZE + BLOCK_SIZE + 40, BLOCK_SIZE + 130);
+    ventana.getWindow().draw(textoAcumulado);
+    // Texto SIG PIEZA
+    sf::Text textoSigPieza;
+    textoSigPieza.setFont(fuente);
+    textoSigPieza.setString("SIG PIEZA");
+    textoSigPieza.setCharacterSize(24);
+    textoSigPieza.setFillColor(sf::Color::White);
+    textoSigPieza.setStyle(sf::Text::Bold);
+    textoSigPieza.setPosition(Tablero::ANCHO * BLOCK_SIZE + BLOCK_SIZE + 5, 250);
+    ventana.getWindow().draw(textoSigPieza);
+    // Texto NIVEL
+    sf::Text textoNivel;
+    textoNivel.setFont(fuente);
+    textoNivel.setString("NIVEL");
+    textoNivel.setCharacterSize(24);
+    textoNivel.setFillColor(sf::Color::White);
+    textoNivel.setStyle(sf::Text::Bold);
+    textoNivel.setPosition(Tablero::ANCHO * BLOCK_SIZE + BLOCK_SIZE + 40, 463);
+    ventana.getWindow().draw(textoNivel);
+    // Texto nivel actual
+    sf::Text textoNivelActual;
+    textoNivelActual.setFont(fuente);
+    textoNivelActual.setString(std::to_string(nivel));
+    textoNivelActual.setCharacterSize(24);
+    textoNivelActual.setFillColor(sf::Color::White);
+    textoNivelActual.setStyle(sf::Text::Bold);
+    textoNivelActual.setPosition(Tablero::ANCHO * BLOCK_SIZE + BLOCK_SIZE + 63.5, 512);
+    ventana.getWindow().draw(textoNivelActual);
+    // Próxima pieza
+    dibujarProximaPieza();
+}
+
 void Juego::jugar() {
     // Crear un objeto de sonido para MovePieza
     Audio sonidoMover("assets/music/MovePieza.ogg");
@@ -79,7 +188,7 @@ void Juego::jugar() {
     sonidoHit.setVolume(75); // Reducir el volumen tres veces más
 
     // Reducir el volumen de la música de fondo Tetris
-    musica.setVolume(33); // Reducir el volumen a un tercio
+    musica.setVolume(20); // Volumen más bajo
 
     sf::Clock clock;
     float timer = 0, delay = 0.5;
@@ -88,7 +197,7 @@ void Juego::jugar() {
 
     // Reproducir el sonido de inicio del juego
     Audio sonidoInicio("assets/music/EmpezarJuego.ogg");
-    sonidoInicio.reproducir();
+    sonidoInicio.reproducir(); // No mostrar mensajes en terminal
 
     // Inicializar nivel y puntaje
     int nivel = 1;
@@ -116,6 +225,11 @@ void Juego::jugar() {
             // Detectar la tecla 'Q' para alternar entre pausa y reanudar
             if (e.type == sf::Event::KeyPressed && e.key.code == sf::Keyboard::Q) {
                 enPausa = !enPausa; // Alternar el estado de pausa
+                if (enPausa) {
+                    musica.pausar(); // Pausar música
+                } else {
+                    musica.reanudar(); // Reanudar música
+                }
                 continue; // Asegurar que el estado de pausa se procese correctamente
             }
 
@@ -133,19 +247,27 @@ void Juego::jugar() {
                         if (tablero.colision(*piezaActual)) {
                             piezaActual->y--;
                             tablero.fijarPieza(*piezaActual);
-
-                            // Reproducir el sonido al fijar la pieza
                             sonidoHit.reproducir();
-
-                            // Incrementar puntaje y nivel
-                            int lineasEliminadas = tablero.limpiarLineas(ventana.getWindow()); // Pasar la ventana como argumento
+                            // Eliminar todas las líneas completas correctamente
+                            int lineasEliminadas = 0;
+                            for (int i = Tablero::ALTO - 1; i >= 0; --i) {
+                                bool llena = true;
+                                for (int j = 0; j < Tablero::ANCHO; ++j) {
+                                    if (!tablero.matriz[i][j]) llena = false;
+                                }
+                                if (llena) {
+                                    tablero.matriz.erase(tablero.matriz.begin() + i);
+                                    tablero.matriz.insert(tablero.matriz.begin(), std::vector<int>(Tablero::ANCHO, 0));
+                                    ++lineasEliminadas;
+                                    ++i; // Revisar de nuevo la misma fila
+                                }
+                            }
                             if (lineasEliminadas > 0) {
-                                sonidoLinea.reproducir(); // Reproducir sonido si se eliminan líneas
+                                sonidoLinea.reproducir();
                             }
                             puntaje += lineasEliminadas * 100;
-                            nivel = 1 + puntaje / 1000; // Subir nivel cada 1000 puntos
-                            delay = velocidadBase / nivel; // Aumentar velocidad
-
+                            nivel = 1 + puntaje / 1000;
+                            delay = velocidadBase / nivel;
                             nuevaPieza();
                         }
                         break;
@@ -165,7 +287,94 @@ void Juego::jugar() {
                     default:
                         break;
                 }
+            } else {
+                musica.pausar(); // Pausar música al pausar el juego
             }
+        }
+
+        if (enPausa) {
+            musica.pausar();
+
+            // 1. Dibuja el estado actual del juego (tablero, piezas, UI lateral, próxima pieza)
+            ventana.limpiar();
+            // Dibuja el tablero
+            for (int i = 0; i < Tablero::ALTO; ++i) {
+                for (int j = 0; j < Tablero::ANCHO; ++j) {
+                    if (tablero.matriz[i][j]) {
+                        sf::RectangleShape block(sf::Vector2f(BLOCK_SIZE-4, BLOCK_SIZE-4));
+                        block.setFillColor(sf::Color(128, 128, 128));
+                        block.setOutlineThickness(2);
+                        block.setOutlineColor(sf::Color::Black);
+                        block.setPosition(j * BLOCK_SIZE + 2, i * BLOCK_SIZE + 2);
+                        ventana.getWindow().draw(block);
+                        sf::RectangleShape brillo(sf::Vector2f((BLOCK_SIZE-4) / 4, (BLOCK_SIZE-4) / 4));
+                        brillo.setFillColor(sf::Color(255, 255, 255, 150));
+                        brillo.setPosition(j * BLOCK_SIZE + 2, i * BLOCK_SIZE + 2);
+                        ventana.getWindow().draw(brillo);
+                    }
+                }
+            }
+            // Dibuja la pieza actual
+            for (size_t i = 0; i < piezaActual->forma.size(); ++i)
+                for (size_t j = 0; j < piezaActual->forma[0].size(); ++j)
+                    if (piezaActual->forma[i][j]) {
+                        sf::RectangleShape block(sf::Vector2f(BLOCK_SIZE-4, BLOCK_SIZE-4));
+                        switch (piezaActual->tipo) {
+                            case 0: block.setFillColor(sf::Color::Cyan); break;
+                            case 1: block.setFillColor(sf::Color::Yellow); break;
+                            case 2: block.setFillColor(sf::Color::Magenta); break;
+                            case 3: block.setFillColor(sf::Color::Green); break;
+                            case 4: block.setFillColor(sf::Color::Red); break;
+                            case 5: block.setFillColor(sf::Color::Blue); break;
+                            case 6: block.setFillColor(sf::Color(255,140,0)); break;
+                            default: block.setFillColor(sf::Color::White); break;
+                        }
+                        block.setOutlineThickness(2);
+                        block.setOutlineColor(sf::Color::Black);
+                        block.setPosition((piezaActual->x + j) * BLOCK_SIZE + 2, (piezaActual->y + i) * BLOCK_SIZE + 2);
+                        ventana.getWindow().draw(block);
+                        sf::RectangleShape brillo(sf::Vector2f((BLOCK_SIZE-4) / 4, (BLOCK_SIZE-4) / 4));
+                        brillo.setFillColor(sf::Color(255, 255, 255, 150));
+                        brillo.setPosition((piezaActual->x + j) * BLOCK_SIZE + 2, (piezaActual->y + i) * BLOCK_SIZE + 2);
+                        ventana.getWindow().draw(brillo);
+                    }
+            // Dibuja la UI lateral completa (recuadro, textos, puntuación, próxima pieza)
+            dibujarUILateral(puntaje, nivel, fuente);
+
+            // 2. Dibuja overlay negro translúcido SOLO sobre el área del tablero (no sobre la UI lateral)
+            sf::RectangleShape overlay(sf::Vector2f(Tablero::ANCHO * BLOCK_SIZE, Tablero::ALTO * BLOCK_SIZE));
+            overlay.setFillColor(sf::Color(0, 0, 0, 180));
+            overlay.setPosition(0, 0);
+            ventana.getWindow().draw(overlay);
+
+            // 3. Dibuja el menú de pausa centrado
+            dibujarMenuPausa(ventana.getWindow(), fuente);
+            ventana.getWindow().display();
+            // Pausar el bucle hasta que se reanude o reinicie
+            bool salirPausa = false;
+            while (enPausa && !salirPausa) {
+                sf::Event eventoPausa;
+                while (ventana.obtenerEvento(eventoPausa)) {
+                    if (eventoPausa.type == sf::Event::KeyPressed) {
+                        if (eventoPausa.key.code == sf::Keyboard::Q) {
+                            enPausa = false; // Reanudar
+                        }
+                        if (eventoPausa.key.code == sf::Keyboard::R) {
+                            // Reiniciar el juego
+                            salirPausa = true;
+                            // Reinicia variables principales
+                            puntaje = 0;
+                            nivel = 1;
+                            delay = velocidadBase;
+                            tablero = Tablero();
+                            nuevaPieza();
+                        }
+                    }
+                }
+            }
+            if (salirPausa) continue; // Salta el resto del ciclo para reiniciar
+        } else {
+            musica.reanudar(); // Reanudar música si se reanuda el juego;
         }
 
         if (!enPausa) {
@@ -175,19 +384,95 @@ void Juego::jugar() {
                 if (tablero.colision(*piezaActual)) {
                     piezaActual->y--;
                     tablero.fijarPieza(*piezaActual);
-
-                    // Reproducir el sonido al fijar la pieza
                     sonidoHit.reproducir();
+                    // Detectar filas completas
+                    std::vector<int> filasCompletas;
+                    for (int i = Tablero::ALTO - 1; i >= 0; --i) {
+                        bool llena = true;
+                        for (int j = 0; j < Tablero::ANCHO; ++j) {
+                            if (!tablero.matriz[i][j]) llena = false;
+                        }
+                        if (llena) {
+                            filasCompletas.push_back(i);
+                        }
+                    }
+                    // Animación de parpadeo blanco para filas completas
+                    if (!filasCompletas.empty()) {
+                        const int parpadeos = 6; // Número de parpadeos
+                        const float duracionParpadeo = 0.06f; // Duración de cada parpadeo (segundos)
+                        for (int p = 0; p < parpadeos; ++p) {
+                            ventana.limpiar();
+                            // Dibuja el tablero con filas parpadeando
+                            for (int i = 0; i < Tablero::ALTO; ++i) {
+                                for (int j = 0; j < Tablero::ANCHO; ++j) {
+                                    if (tablero.matriz[i][j]) {
+                                        sf::RectangleShape block(sf::Vector2f(BLOCK_SIZE-4, BLOCK_SIZE-4));
+                                        bool esFilaParpadeo = std::find(filasCompletas.begin(), filasCompletas.end(), i) != filasCompletas.end();
+                                        if (esFilaParpadeo) {
+                                            if (p % 2 == 0)
+                                                block.setFillColor(sf::Color::White); // Parpadeo blanco
+                                            else
+                                                block.setFillColor(sf::Color(200, 200, 200)); // Gris claro
+                                        } else {
+                                            block.setFillColor(sf::Color(128, 128, 128));
+                                        }
+                                        block.setOutlineThickness(2);
+                                        block.setOutlineColor(sf::Color::Black);
+                                        block.setPosition(j * BLOCK_SIZE + 2, i * BLOCK_SIZE + 2);
+                                        ventana.getWindow().draw(block);
+                                        // Brillo pixelado
+                                        sf::RectangleShape brillo(sf::Vector2f((BLOCK_SIZE-4) / 4, (BLOCK_SIZE-4) / 4));
+                                        brillo.setFillColor(sf::Color(255, 255, 255, 150));
+                                        brillo.setPosition(j * BLOCK_SIZE + 2, i * BLOCK_SIZE + 2);
+                                        ventana.getWindow().draw(brillo);
+                                    }
+                                }
+                            }
+                            // Dibuja la pieza actual y UI
+                            for (size_t i = 0; i < piezaActual->forma.size(); ++i)
+                                for (size_t j = 0; j < piezaActual->forma[0].size(); ++j)
+                                    if (piezaActual->forma[i][j]) {
+                                        sf::RectangleShape block(sf::Vector2f(BLOCK_SIZE-4, BLOCK_SIZE-4));
+                                        switch (piezaActual->tipo) {
+                                            case 0: block.setFillColor(sf::Color::Cyan); break;
+                                            case 1: block.setFillColor(sf::Color::Yellow); break;
+                                            case 2: block.setFillColor(sf::Color::Magenta); break;
+                                            case 3: block.setFillColor(sf::Color::Green); break;
+                                            case 4: block.setFillColor(sf::Color::Red); break;
+                                            case 5: block.setFillColor(sf::Color::Blue); break;
+                                            case 6: block.setFillColor(sf::Color(255,140,0)); break;
+                                            default: block.setFillColor(sf::Color::White); break;
+                                        }
+                                        block.setOutlineThickness(2);
+                                        block.setOutlineColor(sf::Color::Black);
+                                        block.setPosition((piezaActual->x + j) * BLOCK_SIZE + 2, (piezaActual->y + i) * BLOCK_SIZE + 2);
+                                        ventana.getWindow().draw(block);
+                                        sf::RectangleShape brillo(sf::Vector2f((BLOCK_SIZE-4) / 4, (BLOCK_SIZE-4) / 4));
+                                        brillo.setFillColor(sf::Color(255, 255, 255, 150));
+                                        brillo.setPosition((piezaActual->x + j) * BLOCK_SIZE + 2, (piezaActual->y + i) * BLOCK_SIZE + 2);
+                                        ventana.getWindow().draw(brillo);
+                                    }
+                            // UI: recuadros, puntaje, nivel, próxima pieza
+                            dibujarUILateral(puntaje, nivel, fuente);
 
-                    // Incrementar puntaje y nivel
-                    int lineasEliminadas = tablero.limpiarLineas(ventana.getWindow()); // Pasar la ventana como argumento
+                            ventana.mostrar();
+                            sf::sleep(sf::seconds(duracionParpadeo));
+                        }
+                    }
+                    // Eliminar filas completas
+                    int lineasEliminadas = 0;
+                    for (int idx = filasCompletas.size() - 1; idx >= 0; --idx) {
+                        int fila = filasCompletas[idx];
+                        tablero.matriz.erase(tablero.matriz.begin() + fila);
+                        tablero.matriz.insert(tablero.matriz.begin(), std::vector<int>(Tablero::ANCHO, 0));
+                        ++lineasEliminadas;
+                    }
                     if (lineasEliminadas > 0) {
-                        sonidoLinea.reproducir(); // Reproducir sonido si se eliminan líneas
+                        sonidoLinea.reproducir();
                     }
                     puntaje += lineasEliminadas * 100;
-                    nivel = 1 + puntaje / 1000; // Subir nivel cada 1000 puntos
-                    delay = velocidadBase / nivel; // Aumentar velocidad
-
+                    nivel = 1 + puntaje / 1000;
+                    delay = velocidadBase / nivel;
                     nuevaPieza();
                 }
                 timer = 0;
@@ -252,20 +537,12 @@ void Juego::jugar() {
                         ventana.getWindow().draw(brillo);
                     }
 
-            // Agregar un recuadro a la derecha del tablero
-            sf::RectangleShape recuadroDerecho(sf::Vector2f(6 * BLOCK_SIZE, Tablero::ALTO * BLOCK_SIZE));
-            recuadroDerecho.setFillColor(sf::Color(0, 0, 0, 150)); // Fondo negro translúcido
-            recuadroDerecho.setOutlineThickness(2);
-            recuadroDerecho.setOutlineColor(sf::Color::White);
-            recuadroDerecho.setPosition(Tablero::ANCHO * BLOCK_SIZE, 0);
-            ventana.getWindow().draw(recuadroDerecho);
+            // Agregar un recuadro a la derecha del tablero y la UI lateral
+            dibujarUILateral(puntaje, nivel, fuente);
 
             // Cargar la fuente Arial desde la ruta correcta
             sf::Font fuente;
-            if (!fuente.loadFromFile("assets/fonts/Pixel.ttf")) {
-                std::cerr << "Error: No se pudo cargar la fuente Pixel desde 'assets/fonts/Pixel.ttf'. Verifica que el archivo exista y sea válido." << std::endl;
-                return; // Salir si no se puede cargar la fuente
-            }
+            fuente.loadFromFile("assets/fonts/Pixel.ttf"); // No mostrar mensaje de error
 
             // Configurar y dibujar el texto 'PUNTOS'
             sf::Text textoPuntos;
@@ -350,10 +627,7 @@ void Juego::jugar() {
         } else {
             // Cargar la fuente si no está cargada
             sf::Font fuente;
-            if (!fuente.loadFromFile("assets/fonts/Pixel.ttf")) {
-                std::cerr << "Error: No se pudo cargar la fuente Pixel desde 'assets/fonts/Pixel.ttf'. Verifica que el archivo exista y sea válido." << std::endl;
-                return;
-            }
+            fuente.loadFromFile("assets/fonts/Pixel.ttf"); // No mostrar mensaje de error
 
             if (enPausa) {
                 // Mostrar un mensaje de pausa con opciones
@@ -371,10 +645,16 @@ void Juego::jugar() {
                 textoPausa.setOrigin(boundsTexto.width / 2, boundsTexto.height / 2);
                 textoPausa.setPosition(tamanoVentana.x / 2, tamanoVentana.y / 2);
 
+                // Limpiar la ventana antes de dibujar
+                ventana.getWindow().clear();
+
+                // --- Dibuja la UI lateral durante el menú de pausa ---
+                dibujarUILateral(puntaje, nivel, fuente);
+
                 // Dibujar el texto de pausa
-                ventana.getWindow().clear(); // Limpiar la ventana antes de dibujar
                 ventana.getWindow().draw(textoPausa);
-                ventana.getWindow().display(); // Mostrar el contenido dibujado
+
+                ventana.getWindow().display();
 
                 // Pausar el bucle hasta que se reanude
                 while (enPausa) {
@@ -396,7 +676,7 @@ void Juego::jugar() {
 
         // Reproducir el sonido de GameOver
         Audio sonidoGameOver("assets/music/GameOver.ogg");
-        sonidoGameOver.reproducir();
+        sonidoGameOver.reproducir(); // No mostrar mensajes en terminal
 
         // Mostrar la pantalla de Game Over
         GameOverScreen gameOverScreen(ventana.getWindow());
