@@ -20,6 +20,7 @@ private:
     Pieza* proximaPieza;
     bool gameOver;
     int puntaje;
+    int nivel; // Nivel actual del juego
     sf::Font fuente;
     sf::Text textoPuntaje;
     sf::Texture texturaPiezas; // Textura para las piezas estilo pixel art

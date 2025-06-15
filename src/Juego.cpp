@@ -360,12 +360,30 @@ void Juego::mostrarMenuPrincipal() {
                     opcionSeleccionada = (opcionSeleccionada + 1) % opciones.size();
                 } else if (event.key.code == sf::Keyboard::Enter || event.key.code == sf::Keyboard::Return) {
                     if (opcionSeleccionada == 0) {
-                        // Reproducir sonido de empezar juego SOLO aquí
-                        Audio sonidoInicio("assets/music/EmpezarJuego.ogg");
-                        sonidoInicio.setVolume(20);
-                        sonidoInicio.reproducir();
-                        sf::sleep(sf::seconds(1.0f));
-                        enMenu = false; // Jugar
+                        // Reiniciar el estado del juego
+                        gameOver = false;
+                        puntaje = 0;
+                        nivel = 1; // Reiniciar nivel si aplica
+
+                        // Liberar memoria de piezas anteriores
+                        if (piezaActual) {
+                            delete piezaActual;
+                            piezaActual = nullptr;
+                        }
+                        if (proximaPieza) {
+                            delete proximaPieza;
+                            proximaPieza = nullptr;
+                        }
+
+                        // Crear nuevas piezas
+                        piezaActual = new Pieza(rand() % 7);
+                        proximaPieza = new Pieza(rand() % 7);
+
+                        // Reiniciar el tablero
+                        tablero = Tablero();
+
+                        // Salir del menú y comenzar el juego
+                        enMenu = false;
                     } else if (opcionSeleccionada == 1) {
                         sf::Text scores;
                         scores.setFont(fuente);
@@ -904,8 +922,29 @@ void Juego::jugar() {
             sf::sleep(sf::milliseconds(100));
         }
 
-        // Volver al menú principal
-        mostrarMenuPrincipal(); // Llamar a la función para mostrar el menú principal
-        return;
+        // Reiniciar el estado del juego
+        gameOver = false;
+        puntaje = 0;
+        nivel = 1;
+
+        // Liberar memoria de piezas anteriores
+        if (piezaActual) {
+            delete piezaActual;
+            piezaActual = nullptr;
+        }
+        if (proximaPieza) {
+            delete proximaPieza;
+            proximaPieza = nullptr;
+        }
+
+        // Crear nuevas piezas
+        piezaActual = new Pieza(rand() % 7);
+        proximaPieza = new Pieza(rand() % 7);
+
+        // Reiniciar el tablero
+        tablero = Tablero();
+
+        // Reiniciar el ciclo del juego
+        jugar();
     }
 }
