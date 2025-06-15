@@ -887,4 +887,25 @@ void Juego::jugar() {
         delete proximaPieza;
         proximaPieza = nullptr;
     }
+    if (gameOver) {
+        // Detener la música de fondo
+        musica.detener();
+
+        // Reproducir el sonido de GameOver
+        Audio sonidoGameOver("assets/music/GameOver.ogg");
+        sonidoGameOver.reproducir();
+
+        // Mostrar la pantalla de Game Over
+        GameOverScreen gameOverScreen(ventana.getWindow());
+        gameOverScreen.mostrar();
+
+        // Esperar mientras se reproduce la música de GameOver
+        while (sonidoGameOver.estaReproduciendo()) {
+            sf::sleep(sf::milliseconds(100));
+        }
+
+        // Volver al menú principal
+        mostrarMenuPrincipal(); // Llamar a la función para mostrar el menú principal
+        return;
+    }
 }
