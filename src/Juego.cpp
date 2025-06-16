@@ -922,6 +922,81 @@ void Juego::jugar() {
             sf::sleep(sf::milliseconds(100));
         }
 
+        // Verificar si se rompió el récord
+        int recordActual = 0;
+        std::ifstream archivoRecord("record.txt");
+        if (archivoRecord.is_open()) {
+            archivoRecord >> recordActual;
+            archivoRecord.close();
+        }
+
+        if (puntaje > recordActual) {
+            // Mostrar mensaje de nuevo récord con mejor estética
+            sf::Text textoRecord;
+            textoRecord.setFont(fuente);
+            textoRecord.setString("¡NUEVO RECORD!");
+            textoRecord.setCharacterSize(36);
+            textoRecord.setFillColor(sf::Color::Red);
+            textoRecord.setStyle(sf::Text::Bold);
+            textoRecord.setPosition(ventana.getWindow().getSize().x / 2 - textoRecord.getLocalBounds().width / 2, ventana.getWindow().getSize().y / 2 - 120);
+
+            sf::Text textoInstruccion;
+            textoInstruccion.setFont(fuente);
+            textoInstruccion.setString("Ingresa tu nombre:");
+            textoInstruccion.setCharacterSize(24);
+            textoInstruccion.setFillColor(sf::Color::White);
+            textoInstruccion.setPosition(ventana.getWindow().getSize().x / 2 - textoInstruccion.getLocalBounds().width / 2, ventana.getWindow().getSize().y / 2 - 70);
+
+            // Recuadro para la entrada del nombre
+            sf::RectangleShape recuadroNombre(sf::Vector2f(300, 50));
+            recuadroNombre.setFillColor(sf::Color(0, 0, 0, 150)); // Fondo semitransparente
+            recuadroNombre.setOutlineThickness(2);
+            recuadroNombre.setOutlineColor(sf::Color::White);
+            recuadroNombre.setPosition(ventana.getWindow().getSize().x / 2 - recuadroNombre.getSize().x / 2, ventana.getWindow().getSize().y / 2);
+
+            // Capturar el nombre del jugador
+            std::string nombre;
+            bool capturandoNombre = true;
+            while (capturandoNombre) {
+                sf::Event event;
+                while (ventana.obtenerEvento(event)) {
+                    if (event.type == sf::Event::TextEntered) {
+                        if (event.text.unicode == '\n' || event.text.unicode == '\r') {
+                            capturandoNombre = false; // Salir al presionar Enter
+                        } else if (event.text.unicode == 8 && !nombre.empty()) {
+                            // Manejar retroceso (Backspace)
+                            nombre.pop_back();
+                        } else if (event.text.unicode < 128 && event.text.unicode != 8) {
+                            nombre += static_cast<char>(event.text.unicode);
+                        }
+                    }
+                }
+
+                // Actualizar la pantalla con el nombre ingresado
+                ventana.getWindow().clear();
+                ventana.getWindow().draw(textoRecord);
+                ventana.getWindow().draw(textoInstruccion);
+                ventana.getWindow().draw(recuadroNombre);
+
+                sf::Text textoNombre;
+                textoNombre.setFont(fuente);
+                textoNombre.setString(nombre);
+                textoNombre.setCharacterSize(28);
+                textoNombre.setFillColor(sf::Color::Yellow);
+                textoNombre.setStyle(sf::Text::Italic);
+                textoNombre.setPosition(ventana.getWindow().getSize().x / 2 - textoNombre.getLocalBounds().width / 2, ventana.getWindow().getSize().y / 2 + 10);
+                ventana.getWindow().draw(textoNombre);
+                ventana.getWindow().display();
+            }
+
+            // Guardar el nuevo récord
+            std::ofstream archivoRecordOut("record.txt");
+            if (archivoRecordOut.is_open()) {
+                archivoRecordOut << puntaje << " " << nombre;
+                archivoRecordOut.close();
+            }
+        }
+
         // Reiniciar el estado del juego
         gameOver = false;
         puntaje = 0;
