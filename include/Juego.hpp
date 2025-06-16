@@ -31,4 +31,5 @@ private:
     void dibujarMenuPausa(sf::RenderWindow& window, const sf::Font& fuente); // Menú de pausa centralizado
     void dibujarUILateral(int puntaje, int nivel, sf::Font& fuente);
     void mostrarMenuPrincipal();
+    void mostrarRecords(); // Declaración de la función para mostrar récords
 };

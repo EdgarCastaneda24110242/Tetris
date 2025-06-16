@@ -345,6 +345,7 @@ void Juego::mostrarMenuPrincipal() {
             opcion.setPosition(ventana.getWindow().getSize().x / 2, 250 + i * 60);
             ventana.getWindow().draw(opcion);
         }
+
         ventana.getWindow().display();
         // Manejo de eventos
         sf::Event event;
@@ -360,43 +361,67 @@ void Juego::mostrarMenuPrincipal() {
                     opcionSeleccionada = (opcionSeleccionada + 1) % opciones.size();
                 } else if (event.key.code == sf::Keyboard::Enter || event.key.code == sf::Keyboard::Return) {
                     if (opcionSeleccionada == 0) {
-                        // Reiniciar el estado del juego
+                        // Iniciar el juego
                         gameOver = false;
                         puntaje = 0;
-                        nivel = 1; // Reiniciar nivel si aplica
-
-                        // Liberar memoria de piezas anteriores
-                        if (piezaActual) {
-                            delete piezaActual;
-                            piezaActual = nullptr;
-                        }
-                        if (proximaPieza) {
-                            delete proximaPieza;
-                            proximaPieza = nullptr;
-                        }
-
-                        // Crear nuevas piezas
+                        nivel = 1;
+                        if (piezaActual) delete piezaActual;
+                        if (proximaPieza) delete proximaPieza;
                         piezaActual = new Pieza(rand() % 7);
                         proximaPieza = new Pieza(rand() % 7);
-
-                        // Reiniciar el tablero
                         tablero = Tablero();
-
-                        // Salir del menú y comenzar el juego
                         enMenu = false;
                     } else if (opcionSeleccionada == 1) {
-                        sf::Text scores;
-                        scores.setFont(fuente);
-                        scores.setString("No implementado");
-                        scores.setCharacterSize(32);
-                        scores.setFillColor(sf::Color::White);
-                        scores.setPosition(ventana.getWindow().getSize().x / 2 - 100, 450);
-                        ventana.getWindow().draw(scores);
-                        ventana.getWindow().display();
-                        sf::sleep(sf::seconds(1.5f));
+                        // Mostrar récords en la misma pantalla with actualización de ventana
+                        std::vector<std::pair<int, std::string>> records;
+                        std::ifstream archivoRecord("record.txt");
+                        if (archivoRecord.is_open()) {
+                            int puntos;
+                            std::string nombre;
+                            while (archivoRecord >> puntos && std::getline(archivoRecord, nombre)) {
+                                if (!nombre.empty() && nombre[0] == ' ') {
+                                    nombre = nombre.substr(1);
+                                }
+                                records.emplace_back(puntos, nombre);
+                            }
+                            archivoRecord.close();
+                        }
+                        std::sort(records.begin(), records.end(), [](const std::pair<int, std::string>& a, const std::pair<int, std::string>& b) {
+                            return a.first > b.first;
+                        });
+                        bool mostrandoRecords = true;
+                        while (mostrandoRecords) {
+                            ventana.getWindow().clear();
+                            sf::Text titulo;
+                            titulo.setFont(fuente);
+                            titulo.setString("MEJORES PUNTAJES\n\n"); // Agregar dos saltos de línea para separación
+                            titulo.setCharacterSize(36);
+                            titulo.setFillColor(sf::Color::White);
+                            titulo.setStyle(sf::Text::Bold);
+                            titulo.setPosition(ventana.getWindow().getSize().x / 2 - titulo.getLocalBounds().width / 2, ventana.getWindow().getSize().y / 2 - titulo.getLocalBounds().height / 2 - 100); // Centrar horizontal y verticalmente con un desplazamiento hacia arriba
+                            ventana.getWindow().draw(titulo);
+                            for (size_t i = 0; i < records.size() && i < 10; ++i) {
+                                sf::Text textoRecord;
+                                textoRecord.setFont(fuente);
+                                textoRecord.setString(std::to_string(i + 1) + ". " + records[i].second + " - " + std::to_string(records[i].first));
+                                textoRecord.setCharacterSize(24);
+                                textoRecord.setFillColor(sf::Color::Yellow);
+                                float yOffset = ventana.getWindow().getSize().y / 2 - (records.size() * 30) / 2 + i * 30 + 20; // Reducir aún más el espacio entre el título y los puntajes
+                                textoRecord.setPosition(ventana.getWindow().getSize().x / 2 - textoRecord.getLocalBounds().width / 2, yOffset);
+                                ventana.getWindow().draw(textoRecord);
+                            }
+                            ventana.getWindow().display();
+                            // Manejar eventos para salir de la pantalla de récords
+                            sf::Event event;
+                            while (ventana.obtenerEvento(event)) {
+                                if (event.type == sf::Event::KeyPressed) {
+                                    mostrandoRecords = false;
+                                    break;
+                                }
+                            }
+                        }
                     } else if (opcionSeleccionada == 2) {
                         ventana.getWindow().close();
-                        return;
                     }
                 }
             }
@@ -699,9 +724,6 @@ void Juego::jugar() {
                                         brillo.setPosition((piezaActual->x + j) * BLOCK_SIZE + 2, (piezaActual->y + i) * BLOCK_SIZE + 2);
                                         ventana.getWindow().draw(brillo);
                                     }
-                            // Dibuja la UI lateral y la próxima pieza
-                            dibujarUILateral(puntaje, nivel, fuente);
-                            dibujarProximaPieza();
                             ventana.mostrar();
                             sf::sleep(sf::seconds(duracionParpadeo));
                         }
@@ -989,10 +1011,32 @@ void Juego::jugar() {
                 ventana.getWindow().display();
             }
 
-            // Guardar el nuevo récord
+            // Guardar el nuevo récord y mantener los 5 mejores
+            std::vector<std::pair<int, std::string>> records;
+            std::ifstream archivoRecordIn("record.txt");
+            if (archivoRecordIn.is_open()) {
+                int puntos;
+                std::string nombreExistente;
+                while (archivoRecordIn >> puntos && std::getline(archivoRecordIn, nombreExistente)) {
+                    if (!nombreExistente.empty() && nombreExistente[0] == ' ') {
+                        nombreExistente = nombreExistente.substr(1);
+                    }
+                    records.emplace_back(puntos, nombreExistente);
+                }
+                archivoRecordIn.close();
+            }
+            records.emplace_back(puntaje, nombre);
+            std::sort(records.begin(), records.end(), [](const std::pair<int, std::string>& a, const std::pair<int, std::string>& b) {
+                return a.first > b.first;
+            });
+            if (records.size() > 5) {
+                records.resize(5); // Mantener solo los 5 mejores
+            }
             std::ofstream archivoRecordOut("record.txt");
             if (archivoRecordOut.is_open()) {
-                archivoRecordOut << puntaje << " " << nombre;
+                for (const auto& record : records) {
+                    archivoRecordOut << record.first << " " << record.second << "\n";
+                }
                 archivoRecordOut.close();
             }
         }
@@ -1021,5 +1065,92 @@ void Juego::jugar() {
 
         // Reiniciar el ciclo del juego
         jugar();
+    }
+}
+
+// Declaración de la función mostrarRecords
+void Juego::mostrarRecords() {
+    sf::RenderWindow ventanaRecords(sf::VideoMode(800, 600), "Records - Tetris");
+    ventanaRecords.setFramerateLimit(60);
+
+    // Cargar la fuente Pixel.ttf
+    sf::Font fuente;
+    if (!fuente.loadFromFile("assets/fonts/Pixel.ttf")) {
+        std::cerr << "Error: No se pudo cargar la fuente Pixel.ttf" << std::endl;
+        return;
+    }
+
+    // Variables para los récords
+    std::vector<std::pair<int, std::string>> records;
+    int recordActual = 0;
+
+    // Leer los récords del archivo
+    std::ifstream archivoRecord("record.txt");
+    if (archivoRecord.is_open()) {
+        int puntaje;
+        std::string nombre;
+        while (archivoRecord >> puntaje >> nombre) {
+            records.push_back(std::make_pair(puntaje, nombre));
+        }
+        archivoRecord.close();
+    }
+
+    // Ordenar los récords de mayor a menor
+    std::sort(records.begin(), records.end(), std::greater<std::pair<int, std::string>>());
+
+    // Obtener el récord actual si existe
+    if (!records.empty()) {
+        recordActual = records[0].first;
+    }
+
+    // Bucle principal de la ventana de récords
+    while (ventanaRecords.isOpen()) {
+        sf::Event event;
+        while (ventanaRecords.pollEvent(event)) {
+            if (event.type == sf::Event::Closed)
+                ventanaRecords.close();
+            if (event.type == sf::Event::KeyPressed) {
+                if (event.key.code == sf::Keyboard::Escape) {
+                    ventanaRecords.close();
+                }
+            }
+        }
+
+        ventanaRecords.clear(sf::Color(0, 0, 0));
+
+        // Dibujar el título "RECORDS"
+        sf::Text textoTitulo;
+        textoTitulo.setFont(fuente);
+        textoTitulo.setString("RECORDS");
+        textoTitulo.setCharacterSize(48);
+        textoTitulo.setFillColor(sf::Color::White);
+        textoTitulo.setStyle(sf::Text::Bold);
+        sf::FloatRect boundsTitulo = textoTitulo.getLocalBounds();
+        textoTitulo.setOrigin(boundsTitulo.width / 2, boundsTitulo.height / 2);
+        textoTitulo.setPosition(ventanaRecords.getSize().x / 2, 50);
+        ventanaRecords.draw(textoTitulo);
+
+        // Dibujar el récord actual
+        sf::Text textoRecordActual;
+        textoRecordActual.setFont(fuente);
+        textoRecordActual.setString("Tu récord: " + std::to_string(recordActual));
+        textoRecordActual.setCharacterSize(24);
+        textoRecordActual.setFillColor(sf::Color::Yellow);
+        textoRecordActual.setPosition(50, 150);
+        ventanaRecords.draw(textoRecordActual);
+
+        // Dibujar la lista de récords
+        for (size_t i = 0; i < records.size(); ++i) {
+            const auto& [puntaje, nombre] = records[i];
+            sf::Text textoRecord;
+            textoRecord.setFont(fuente);
+            textoRecord.setString(std::to_string(i + 1) + ". " + nombre + " - " + std::to_string(puntaje));
+            textoRecord.setCharacterSize(24);
+            textoRecord.setFillColor(sf::Color::White);
+            textoRecord.setPosition(ventanaRecords.getSize().x / 2 - textoRecord.getLocalBounds().width / 2, ventanaRecords.getSize().y / 2 - textoRecord.getLocalBounds().height / 2 + 50 + i * 30); // Centrar horizontal y verticalmente los puntajes con desplazamiento
+            ventanaRecords.draw(textoRecord);
+        }
+
+        ventanaRecords.display();
     }
 }
