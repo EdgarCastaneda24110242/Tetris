@@ -26,10 +26,10 @@ void Musica::reanudar() {
         musica.play();
 }
 
-bool Musica::estaReproduciendo() const {
+bool Musica::verificarSiEstaReproduciendo() const {
     return musica.getStatus() == sf::Music::Playing;
 }
 
-void Musica::setVolume(float volumen) {
+void Musica::establecerVolumen(float volumen) {
     musica.setVolume(volumen);
 }

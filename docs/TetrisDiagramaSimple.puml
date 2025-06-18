@@ -1,0 +1,228 @@
+@startuml TetrisDiagramaSimple
+
+!theme plain
+skinparam backgroundColor white
+skinparam classBackgroundColor #E6F3FF
+skinparam classBorderColor #2E86AB
+skinparam arrow {
+    Color #2E86AB
+}
+
+title TETRIS - DIAGRAMA DE CLASES SIMPLIFICADO\nArquitectura Principal del Proyecto
+
+' ===================================
+' === CLASES PRINCIPALES ===
+' ===================================
+
+class Juego {
+    - ventana : Ventana
+    - tablero : Tablero
+    - piezaActual : Pieza*
+    - proximaPieza : Pieza*
+    - gameOver : bool
+    - puntaje : int
+    - nivel : int
+    - musica : Musica
+    __
+    + Juego(ventanaPrincipal : sf::RenderWindow&)
+    + jugar() : void
+    + crearNuevaPieza() : void
+    + mostrarMenuPrincipal() : void
+    + mostrarRecords() : void
+}
+
+class Tablero {
+    + ANCHO : int = 10
+    + ALTO : int = 20
+    + matriz : vector<vector<int>>
+    __
+    + Tablero()
+    + colision(pieza : Pieza&) : bool
+    + fijarPieza(pieza : Pieza&) : void
+    + limpiarLineas(ventana : sf::RenderWindow&) : int
+}
+
+class Pieza {
+    + tipo : int
+    + x : int
+    + y : int
+    + forma : vector<vector<int>>
+    __
+    + Pieza(tipo : int)
+    + rotar() : void
+}
+
+class Ventana {
+    - window : sf::RenderWindow*
+    __
+    + Ventana(ancho : int, alto : int, titulo : string)
+    + verificarSiEstaAbierta() : bool
+    + limpiar() : void
+    + mostrar() : void
+    + procesarEvento(evento : sf::Event&) : bool
+    + obtenerVentana() : sf::RenderWindow&
+}
+
+class Musica {
+    - musica : sf::Music
+    __
+    + Musica(rutaArchivo : string)
+    + reproducir() : void
+    + detener() : void
+    + pausar() : void
+    + establecerVolumen(volumen : float) : void
+}
+
+class Audio {
+    - musica : sf::Music
+    __
+    + Audio(rutaArchivo : string)
+    + reproducir() : void
+    + verificarSiEstaReproduciendo() : bool
+    + establecerVolumen(volumen : float) : void
+}
+
+' ===================================
+' === CLASES DE UTILIDAD ===
+' ===================================
+
+class Puntos {
+    - puntaje : int
+    __
+    + Puntos()
+    + agregarPuntos(lineas : int) : void
+    + calcularPuntaje() : int
+    + reiniciar() : void
+}
+
+class GameOverScreen {
+    - ventana : sf::RenderWindow&
+    __
+    + GameOverScreen(ventana : sf::RenderWindow&)
+    + mostrar() : void
+}
+
+class Controles {
+    __
+    + procesarEvento(evento : sf::Event&) : Accion
+}
+
+enum Accion {
+    Ninguna
+    MoverIzquierda
+    MoverDerecha
+    Bajar
+    Rotar
+    Salir
+}
+
+' ===================================
+' === CLASES DE RENDERIZADO ===
+' ===================================
+
+class TableroRender {
+    __
+    + dibujarFondo(...) : void
+    + dibujarTablero(...) : void
+    + dibujarPieza(...) : void
+}
+
+class FondoTablero {
+    __
+    + dibujar(...) : void
+}
+
+class Bloque {
+    __
+    + dibujar(...) : void
+}
+
+class ColorPieza {
+    __
+    + obtener(tipo : int) : sf::Color
+}
+
+class Tetris {
+    - tablero : Tablero
+    - piezaActual : Pieza*
+    - gameOver : bool
+    __
+    + Tetris()
+    + jugar() : void
+    + crearNuevaPieza() : void
+}
+
+' ===================================
+' === RELACIONES PRINCIPALES ===
+' ===================================
+
+' COMPOSICIÓN - El contenedor controla el ciclo de vida
+Juego *-- Tablero
+Juego *-- Ventana  
+Juego *-- Musica
+
+' AGREGACIÓN - El contenedor usa pero no controla
+Juego o-- "2" Pieza : "actual + próxima"
+Tetris o-- Pieza
+
+' ASOCIACIÓN - Uso/Interacción
+Juego --> GameOverScreen : "crea"
+Juego --> Audio : "usa"
+Juego --> Puntos : "calcula"
+
+TableroRender --> Tablero
+TableroRender --> Pieza
+TableroRender --> Bloque
+TableroRender --> ColorPieza
+
+Tablero --> Pieza : "verifica colisiones"
+Controles --> Accion
+
+' DEPENDENCIAS
+Juego ..> TableroRender : "usa"
+Juego ..> ColorPieza : "usa"
+
+' ===================================
+' === NOTAS EXPLICATIVAS ===
+' ===================================
+
+note top of Juego
+**CONTROLADOR PRINCIPAL**
+Maneja toda la lógica del juego,
+menús, puntuaciones y estados
+end note
+
+note right of Tablero
+**MODELO DE DATOS**
+Matriz 20x10 con lógica
+de colisiones y eliminación
+de líneas completas
+end note
+
+note bottom of TableroRender
+**VISTA/RENDERIZADO**
+Clases estáticas que se encargan
+de dibujar todos los elementos
+visuales del juego
+end note
+
+note left of Tetris
+**IMPLEMENTACIÓN ALTERNATIVA**
+Versión simplificada del juego
+con menos funcionalidades
+end note
+
+note bottom
+**ARQUITECTURA:**
+• Juego = Controlador principal (MVC)
+• Tablero = Modelo de datos
+• TableroRender = Vista/Renderizado
+• Ventana = Wrapper de SFML
+
+**PATRONES:**
+• Composición para componentes principales
+• Static Factory para renderizado
+• Wrapper para encapsular SFML
+end note
+
+@enduml

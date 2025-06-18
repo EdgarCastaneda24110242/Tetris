@@ -25,7 +25,7 @@ private:
     sf::Text textoPuntaje;
     sf::Texture texturaPiezas; // Textura para las piezas estilo pixel art
     Musica musica; // Manejo de la música de fondo
-    void nuevaPieza();
+    void crearNuevaPieza();
     void actualizarPuntaje();
     void dibujarProximaPieza(); // Declaración de la función para dibujar la próxima pieza
     void dibujarMenuPausa(sf::RenderWindow& window, const sf::Font& fuente); // Menú de pausa centralizado

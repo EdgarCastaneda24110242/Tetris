@@ -9,6 +9,6 @@ private:
 public:
     explicit Audio(const std::string& rutaArchivo);
     void reproducir();
-    bool estaReproduciendo() const;
-    void setVolume(float volumen); // Método para ajustar el volumen
+    bool verificarSiEstaReproduciendo() const;
+    void establecerVolumen(float volumen); // Método para ajustar el volumen
 };

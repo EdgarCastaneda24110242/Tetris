@@ -11,8 +11,8 @@ public:
     void detener();
     void pausar();
     void reanudar();
-    bool estaReproduciendo() const; // Verificar si el sonido está reproduciéndose
-    void setVolume(float volumen); // Método para ajustar el volumen
+    bool verificarSiEstaReproduciendo() const; // Verificar si el sonido está reproduciéndose
+    void establecerVolumen(float volumen); // Método para ajustar el volumen
 
 private:
     sf::Music musica;

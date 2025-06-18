@@ -10,5 +10,5 @@ private:
     Tablero tablero;
     Pieza* piezaActual;
     bool gameOver;
-    void nuevaPieza();
+    void crearNuevaPieza();
 };

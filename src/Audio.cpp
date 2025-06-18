@@ -21,10 +21,10 @@ void Audio::reproducir() {
     }
 }
 
-bool Audio::estaReproduciendo() const {
+bool Audio::verificarSiEstaReproduciendo() const {
     return musica.getStatus() == sf::Music::Playing;
 }
 
-void Audio::setVolume(float volumen) {
+void Audio::establecerVolumen(float volumen) {
     musica.setVolume(volumen);
 }

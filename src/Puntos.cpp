@@ -13,7 +13,7 @@ void Puntos::agregarPuntos(int lineas) {
     }
 }
 
-int Puntos::obtenerPuntaje() const {
+int Puntos::calcularPuntaje() const {
     return puntaje;
 }
 

@@ -38,7 +38,7 @@ Juego::Juego(sf::RenderWindow& ventanaPrincipal)
     // No reproducir música aquí, solo cuando empiece el juego
 }
 
-void Juego::nuevaPieza() {
+void Juego::crearNuevaPieza() {
     // Asignar la próxima pieza como actual (sin liberar memoria aquí)
     piezaActual = proximaPieza;
     // Crear una nueva próxima pieza
@@ -78,7 +78,7 @@ void Juego::dibujarProximaPieza() {
                 bloque.setOutlineThickness(2);
                 bloque.setOutlineColor(sf::Color::Black);
                 bloque.setPosition(piezaOffsetX + j * BLOCK_SIZE, piezaOffsetY + i * BLOCK_SIZE);
-                ventana.getWindow().draw(bloque);
+                ventana.obtenerVentana().draw(bloque);
             }
         }
     }
@@ -156,7 +156,7 @@ void Juego::dibujarUILateral(int puntaje, int nivel, sf::Font& fuente) {
     recuadroDerecho.setOutlineThickness(2);
     recuadroDerecho.setOutlineColor(sf::Color::White);
     recuadroDerecho.setPosition(Tablero::ANCHO * BLOCK_SIZE, 0);
-    ventana.getWindow().draw(recuadroDerecho);
+    ventana.obtenerVentana().draw(recuadroDerecho);
     // Texto PUNTOS
     sf::Text textoPuntos;
     textoPuntos.setFont(fuente);
@@ -165,21 +165,21 @@ void Juego::dibujarUILateral(int puntaje, int nivel, sf::Font& fuente) {
     textoPuntos.setFillColor(sf::Color::White);
     textoPuntos.setStyle(sf::Text::Bold);
     textoPuntos.setPosition(Tablero::ANCHO * BLOCK_SIZE + BLOCK_SIZE + 3, BLOCK_SIZE + 63);
-    ventana.getWindow().draw(textoPuntos);
+    ventana.obtenerVentana().draw(textoPuntos);
     // Recuadro pequeño debajo de PUNTOS
     sf::RectangleShape recuadro(sf::Vector2f(120, 120));
     recuadro.setFillColor(sf::Color(30, 30, 30));
     recuadro.setOutlineThickness(2);
     recuadro.setOutlineColor(sf::Color::White);
     recuadro.setPosition(Tablero::ANCHO * BLOCK_SIZE + BLOCK_SIZE + 10, 300);
-    ventana.getWindow().draw(recuadro);
+    ventana.obtenerVentana().draw(recuadro);
     // Recuadro de puntos acumulados
     sf::RectangleShape recuadroPuntos(sf::Vector2f(120, 50));
     recuadroPuntos.setFillColor(sf::Color(30, 30, 30));
     recuadroPuntos.setOutlineThickness(2);
     recuadroPuntos.setOutlineColor(sf::Color::White);
     recuadroPuntos.setPosition(Tablero::ANCHO * BLOCK_SIZE + BLOCK_SIZE + 10, BLOCK_SIZE + 120);
-    ventana.getWindow().draw(recuadroPuntos);
+    ventana.obtenerVentana().draw(recuadroPuntos);
     // Texto de puntos acumulados
     sf::Text textoAcumulado;
     textoAcumulado.setFont(fuente);
@@ -188,7 +188,7 @@ void Juego::dibujarUILateral(int puntaje, int nivel, sf::Font& fuente) {
     textoAcumulado.setFillColor(sf::Color::White);
     textoAcumulado.setStyle(sf::Text::Bold);
     textoAcumulado.setPosition(Tablero::ANCHO * BLOCK_SIZE + BLOCK_SIZE + 40, BLOCK_SIZE + 130);
-    ventana.getWindow().draw(textoAcumulado);
+    ventana.obtenerVentana().draw(textoAcumulado);
     // Texto SIG PIEZA
     sf::Text textoSigPieza;
     textoSigPieza.setFont(fuente);
@@ -197,7 +197,7 @@ void Juego::dibujarUILateral(int puntaje, int nivel, sf::Font& fuente) {
     textoSigPieza.setFillColor(sf::Color::White);
     textoSigPieza.setStyle(sf::Text::Bold);
     textoSigPieza.setPosition(Tablero::ANCHO * BLOCK_SIZE + BLOCK_SIZE + 5, 250);
-    ventana.getWindow().draw(textoSigPieza);
+    ventana.obtenerVentana().draw(textoSigPieza);
     // Texto NIVEL
     sf::Text textoNivel;
     textoNivel.setFont(fuente);
@@ -206,7 +206,7 @@ void Juego::dibujarUILateral(int puntaje, int nivel, sf::Font& fuente) {
     textoNivel.setFillColor(sf::Color::White);
     textoNivel.setStyle(sf::Text::Bold);
     textoNivel.setPosition(Tablero::ANCHO * BLOCK_SIZE + BLOCK_SIZE + 40, 463);
-    ventana.getWindow().draw(textoNivel);
+    ventana.obtenerVentana().draw(textoNivel);
     // Texto nivel actual
     sf::Text textoNivelActual;
     textoNivelActual.setFont(fuente);
@@ -215,7 +215,7 @@ void Juego::dibujarUILateral(int puntaje, int nivel, sf::Font& fuente) {
     textoNivelActual.setFillColor(sf::Color::White);
     textoNivelActual.setStyle(sf::Text::Bold);
     textoNivelActual.setPosition(Tablero::ANCHO * BLOCK_SIZE + BLOCK_SIZE + 63.5, 512);
-    ventana.getWindow().draw(textoNivelActual);
+    ventana.obtenerVentana().draw(textoNivelActual);
     // Próxima pieza
     dibujarProximaPieza();
 }
@@ -227,7 +227,7 @@ void Juego::mostrarMenuPrincipal() {
     sf::Font fuenteTetrominoes;
     fuenteTetrominoes.loadFromFile("assets/fonts/tetrominoes.ttf");
     Musica musicaMenu("assets/music/TetrisMenu.ogg");
-    musicaMenu.setVolume(10); // Volumen bajo para el menú principal
+    musicaMenu.establecerVolumen(10); // Volumen bajo para el menú principal
     musicaMenu.reproducir();
 
     // Inicializar generador aleatorio
@@ -235,7 +235,7 @@ void Juego::mostrarMenuPrincipal() {
     // Bloques de fondo animados
     std::vector<BloqueFondo> bloquesFondo;
     const int piezaMaxAncho = 4 * BLOCK_SIZE; // Máximo ancho de una pieza (pieza I)
-    int numColumnas = ventana.getWindow().getSize().x / piezaMaxAncho;
+    int numColumnas = ventana.obtenerVentana().getSize().x / piezaMaxAncho;
     std::vector<bool> columnasOcupadas(numColumnas, false);
     const int numBloquesFondo = std::min(numColumnas, 18); // No más bloques que columnas
     for (int i = 0; i < numBloquesFondo; ++i) {
@@ -250,7 +250,7 @@ void Juego::mostrarMenuPrincipal() {
         } while (columnasOcupadas[col]);
         columnasOcupadas[col] = true;
         b.x = col * piezaMaxAncho + rand() % (piezaMaxAncho - piezaAncho + 1);
-        b.y = static_cast<float>(rand() % ventana.getWindow().getSize().y);
+        b.y = static_cast<float>(rand() % ventana.obtenerVentana().getSize().y);
         b.velocidad = 60 + rand() % 80; // píxeles por segundo
         b.rotacion = 0; // Sin rotación
         b.rotacionVelocidad = 0;
@@ -260,13 +260,13 @@ void Juego::mostrarMenuPrincipal() {
     }
     sf::Clock clockFondo;
 
-    while (enMenu && ventana.estaAbierta()) {
+    while (enMenu && ventana.verificarSiEstaAbierta()) {
         float dt = clockFondo.restart().asSeconds();
         // Actualizar bloques de fondo
         for (int i = 0; i < bloquesFondo.size(); ++i) {
             auto& b = bloquesFondo[i];
             b.y += b.velocidad * dt;
-            if (b.y > ventana.getWindow().getSize().y + 40) {
+            if (b.y > ventana.obtenerVentana().getSize().y + 40) {
                 // Liberar columna anterior
                 int colAnterior = (int)((b.x) / piezaMaxAncho);
                 columnasOcupadas[colAnterior] = false;
@@ -286,7 +286,7 @@ void Juego::mostrarMenuPrincipal() {
                 b.opacidad = 80 + rand() % 60;
             }
         }
-        ventana.getWindow().clear();
+        ventana.obtenerVentana().clear();
         // Dibujar bloques de fondo
         for (const auto& b : bloquesFondo) {
             Pieza pieza(b.tipo);
@@ -301,7 +301,7 @@ void Juego::mostrarMenuPrincipal() {
                         block.setFillColor(color);
                         block.setOutlineThickness(1);
                         block.setOutlineColor(sf::Color(0,0,0,80));
-                        ventana.getWindow().draw(block);
+                        ventana.obtenerVentana().draw(block);
                     }
                 }
             }
@@ -319,8 +319,8 @@ void Juego::mostrarMenuPrincipal() {
         titulo.setStyle(sf::Text::Bold);
         sf::FloatRect boundsTitulo = titulo.getLocalBounds();
         titulo.setOrigin(boundsTitulo.width / 2, boundsTitulo.height / 2);
-        titulo.setPosition(ventana.getWindow().getSize().x / 2, 120);
-        ventana.getWindow().draw(titulo);
+        titulo.setPosition(ventana.obtenerVentana().getSize().x / 2, 120);
+        ventana.obtenerVentana().draw(titulo);
         // Subtítulo "by Fer and Edgar" con fuente Pixel.ttf
         sf::Text subtitulo;
         subtitulo.setFont(fuente);
@@ -330,8 +330,8 @@ void Juego::mostrarMenuPrincipal() {
         subtitulo.setStyle(sf::Text::Bold);
         sf::FloatRect boundsSub = subtitulo.getLocalBounds();
         subtitulo.setOrigin(boundsSub.width / 2, boundsSub.height / 2);
-        subtitulo.setPosition(ventana.getWindow().getSize().x / 2, 170);
-        ventana.getWindow().draw(subtitulo);
+        subtitulo.setPosition(ventana.obtenerVentana().getSize().x / 2, 170);
+        ventana.obtenerVentana().draw(subtitulo);
         // Opciones
         for (size_t i = 0; i < opciones.size(); ++i) {
             sf::Text opcion;
@@ -342,16 +342,16 @@ void Juego::mostrarMenuPrincipal() {
             opcion.setStyle(sf::Text::Bold);
             sf::FloatRect boundsOpcion = opcion.getLocalBounds();
             opcion.setOrigin(boundsOpcion.width / 2, boundsOpcion.height / 2);
-            opcion.setPosition(ventana.getWindow().getSize().x / 2, 250 + i * 60);
-            ventana.getWindow().draw(opcion);
+            opcion.setPosition(ventana.obtenerVentana().getSize().x / 2, 250 + i * 60);
+            ventana.obtenerVentana().draw(opcion);
         }
 
-        ventana.getWindow().display();
+        ventana.obtenerVentana().display();
         // Manejo de eventos
         sf::Event event;
-        while (ventana.obtenerEvento(event)) {
+        while (ventana.procesarEvento(event)) {
             if (event.type == sf::Event::Closed) {
-                ventana.getWindow().close();
+                ventana.obtenerVentana().close();
                 return;
             }
             if (event.type == sf::Event::KeyPressed) {
@@ -391,29 +391,29 @@ void Juego::mostrarMenuPrincipal() {
                         });
                         bool mostrandoRecords = true;
                         while (mostrandoRecords) {
-                            ventana.getWindow().clear();
+                            ventana.obtenerVentana().clear();
                             sf::Text titulo;
                             titulo.setFont(fuente);
                             titulo.setString("MEJORES PUNTAJES\n\n"); // Agregar dos saltos de línea para separación
                             titulo.setCharacterSize(36);
                             titulo.setFillColor(sf::Color::White);
                             titulo.setStyle(sf::Text::Bold);
-                            titulo.setPosition(ventana.getWindow().getSize().x / 2 - titulo.getLocalBounds().width / 2, ventana.getWindow().getSize().y / 2 - titulo.getLocalBounds().height / 2 - 100); // Centrar horizontal y verticalmente con un desplazamiento hacia arriba
-                            ventana.getWindow().draw(titulo);
+                            titulo.setPosition(ventana.obtenerVentana().getSize().x / 2 - titulo.getLocalBounds().width / 2, ventana.obtenerVentana().getSize().y / 2 - titulo.getLocalBounds().height / 2 - 100); // Centrar horizontal y verticalmente con un desplazamiento hacia arriba
+                            ventana.obtenerVentana().draw(titulo);
                             for (size_t i = 0; i < records.size() && i < 10; ++i) {
                                 sf::Text textoRecord;
                                 textoRecord.setFont(fuente);
                                 textoRecord.setString(std::to_string(i + 1) + ". " + records[i].second + " - " + std::to_string(records[i].first));
                                 textoRecord.setCharacterSize(24);
                                 textoRecord.setFillColor(sf::Color::Yellow);
-                                float yOffset = ventana.getWindow().getSize().y / 2 - (records.size() * 30) / 2 + i * 30 + 20; // Reducir aún más el espacio entre el título y los puntajes
-                                textoRecord.setPosition(ventana.getWindow().getSize().x / 2 - textoRecord.getLocalBounds().width / 2, yOffset);
-                                ventana.getWindow().draw(textoRecord);
+                                float yOffset = ventana.obtenerVentana().getSize().y / 2 - (records.size() * 30) / 2 + i * 30 + 20; // Reducir aún más el espacio entre el título y los puntajes
+                                textoRecord.setPosition(ventana.obtenerVentana().getSize().x / 2 - textoRecord.getLocalBounds().width / 2, yOffset);
+                                ventana.obtenerVentana().draw(textoRecord);
                             }
-                            ventana.getWindow().display();
+                            ventana.obtenerVentana().display();
                             // Manejar eventos para salir de la pantalla de récords
                             sf::Event event;
-                            while (ventana.obtenerEvento(event)) {
+                            while (ventana.procesarEvento(event)) {
                                 if (event.type == sf::Event::KeyPressed) {
                                     mostrandoRecords = false;
                                     break;
@@ -421,14 +421,14 @@ void Juego::mostrarMenuPrincipal() {
                             }
                         }
                     } else if (opcionSeleccionada == 2) {
-                        ventana.getWindow().close();
+                        ventana.obtenerVentana().close();
                     }
                 }
             }
         }
     }
     musicaMenu.detener();
-    musica.setVolume(20); // Restaurar volumen normal al salir del menú
+    musica.establecerVolumen(20); // Restaurar volumen normal al salir del menú
 }
 
 void Juego::jugar() {
@@ -437,19 +437,19 @@ void Juego::jugar() {
     musica.reproducir(); // Iniciar la música de fondo del juego
     // Crear un objeto de sonido para MovePieza
     Audio sonidoMover("assets/music/MovePieza.ogg");
-    sonidoMover.setVolume(18); // Reducir el volumen tres veces más
+    sonidoMover.establecerVolumen(18); // Reducir el volumen tres veces más
 
     // Crear un objeto de sonido para HitPieza
     Audio sonidoHit("assets/music/HitPieza.ogg");
-    sonidoHit.setVolume(75); // Reducir el volumen tres veces más
+    sonidoHit.establecerVolumen(75); // Reducir el volumen tres veces más
 
     // Reducir el volumen de la música de fondo Tetris
-    musica.setVolume(20); // Volumen más bajo
+    musica.establecerVolumen(20); // Volumen más bajo
 
     sf::Clock clock;
     float timer = 0, delay = 0.5;
 
-    nuevaPieza();
+    crearNuevaPieza();
 
     // Eliminar la reproducción del sonido de inicio aquí para evitar duplicados
     // Audio sonidoInicio("assets/music/EmpezarJuego.ogg");
@@ -465,18 +465,18 @@ void Juego::jugar() {
 
     // Reproducir el sonido al eliminar líneas
     Audio sonidoLinea("assets/music/LineaPunto.ogg");
-    sonidoLinea.setVolume(50); // Ajustar el volumen
+    sonidoLinea.establecerVolumen(50); // Ajustar el volumen
 
     bool enPausa = false; // Variable para rastrear el estado de pausa
 
-    while (ventana.estaAbierta() && !gameOver) {
+    while (ventana.verificarSiEstaAbierta() && !gameOver) {
         float time = clock.restart().asSeconds();
         timer += time;
 
         sf::Event e;
-        while (ventana.obtenerEvento(e)) {
+        while (ventana.procesarEvento(e)) {
             if (e.type == sf::Event::Closed)
-                ventana.getWindow().close();
+                ventana.obtenerVentana().close();
 
             // Detectar la tecla 'Q' para alternar entre pausa y reanudar
             if (e.type == sf::Event::KeyPressed && e.key.code == sf::Keyboard::Q) {
@@ -524,7 +524,7 @@ void Juego::jugar() {
                             puntaje += lineasEliminadas * 100;
                             nivel = 1 + puntaje / 1000;
                             delay = velocidadBase / nivel;
-                            nuevaPieza();
+                            crearNuevaPieza();
                             if (gameOver) break; // Salir del bucle si se pierde
                         }
                         break;
@@ -562,11 +562,11 @@ void Juego::jugar() {
                         block.setOutlineThickness(2);
                         block.setOutlineColor(sf::Color::Black);
                         block.setPosition(j * BLOCK_SIZE + 2, i * BLOCK_SIZE + 2);
-                        ventana.getWindow().draw(block);
+                        ventana.obtenerVentana().draw(block);
                         sf::RectangleShape brillo(sf::Vector2f((BLOCK_SIZE-4) / 4, (BLOCK_SIZE-4) / 4));
                         brillo.setFillColor(sf::Color(255, 255, 255, 150));
                         brillo.setPosition(j * BLOCK_SIZE + 2, i * BLOCK_SIZE + 2);
-                        ventana.getWindow().draw(brillo);
+                        ventana.obtenerVentana().draw(brillo);
                     }
                 }
             }
@@ -588,11 +588,11 @@ void Juego::jugar() {
                         block.setOutlineThickness(2);
                         block.setOutlineColor(sf::Color::Black);
                         block.setPosition((piezaActual->x + j) * BLOCK_SIZE + 2, (piezaActual->y + i) * BLOCK_SIZE + 2);
-                        ventana.getWindow().draw(block);
+                        ventana.obtenerVentana().draw(block);
                         sf::RectangleShape brillo(sf::Vector2f((BLOCK_SIZE-4) / 4, (BLOCK_SIZE-4) / 4));
                         brillo.setFillColor(sf::Color(255, 255, 255, 150));
                         brillo.setPosition((piezaActual->x + j) * BLOCK_SIZE + 2, (piezaActual->y + i) * BLOCK_SIZE + 2);
-                        ventana.getWindow().draw(brillo);
+                        ventana.obtenerVentana().draw(brillo);
                     }
             // Dibuja la UI lateral completa (recuadro, textos, puntuación, próxima pieza)
             dibujarUILateral(puntaje, nivel, fuente);
@@ -601,27 +601,27 @@ void Juego::jugar() {
             sf::RectangleShape overlay(sf::Vector2f(Tablero::ANCHO * BLOCK_SIZE, Tablero::ALTO * BLOCK_SIZE));
             overlay.setFillColor(sf::Color(0, 0, 0, 180));
             overlay.setPosition(0, 0);
-            ventana.getWindow().draw(overlay);
+            ventana.obtenerVentana().draw(overlay);
 
             // 3. Dibuja el menú de pausa centrado
-            dibujarMenuPausa(ventana.getWindow(), fuente);
-            ventana.getWindow().display();
+            dibujarMenuPausa(ventana.obtenerVentana(), fuente);
+            ventana.obtenerVentana().display();
             // Pausar el bucle hasta que se reanude, reinicie o regrese al menú
             bool salirPausa = false;
             bool regresarMenu = false;
             while (enPausa && !salirPausa && !regresarMenu) {
                 sf::Event eventoPausa;
-                while (ventana.obtenerEvento(eventoPausa)) {
+                while (ventana.procesarEvento(eventoPausa)) {
                     if (eventoPausa.type == sf::Event::KeyPressed) {
                         if (eventoPausa.key.code == sf::Keyboard::Q) {
                             enPausa = false; // Reanudar
                         }
                         if (eventoPausa.key.code == sf::Keyboard::R) {
                             // Transición: pantalla negra y sonido de inicio
-                            ventana.getWindow().clear(sf::Color::Black);
-                            ventana.getWindow().display();
+                            ventana.obtenerVentana().clear(sf::Color::Black);
+                            ventana.obtenerVentana().display();
                             Audio sonidoInicio("assets/music/EmpezarJuego.ogg");
-                            sonidoInicio.setVolume(20);
+                            sonidoInicio.establecerVolumen(20);
                             sonidoInicio.reproducir();
                             sf::sleep(sf::seconds(0.7f)); // Aumenta el tiempo de pantalla negra
                             // Reiniciar la música de fondo
@@ -632,12 +632,12 @@ void Juego::jugar() {
                             nivel = 1;
                             delay = velocidadBase;
                             tablero = Tablero();
-                            nuevaPieza();
+                            crearNuevaPieza();
                             enPausa = false;
                             salirPausa = true;
                         }
                         if (eventoPausa.key.code == sf::Keyboard::M) {
-                            ventana.getWindow().close(); // Ahora sí cerrar el juego
+                            ventana.obtenerVentana().close(); // Ahora sí cerrar el juego
                             salirPausa = true;
                         }
                     }
@@ -691,12 +691,12 @@ void Juego::jugar() {
                                         block.setOutlineThickness(2);
                                         block.setOutlineColor(sf::Color::Black);
                                         block.setPosition(j * BLOCK_SIZE + 2, i * BLOCK_SIZE + 2);
-                                        ventana.getWindow().draw(block);
+                                        ventana.obtenerVentana().draw(block);
                                         // Brillo pixelado
                                         sf::RectangleShape brillo(sf::Vector2f((BLOCK_SIZE-4) / 4, (BLOCK_SIZE-4) / 4));
                                         brillo.setFillColor(sf::Color(255, 255, 255, 150));
                                         brillo.setPosition(j * BLOCK_SIZE + 2, i * BLOCK_SIZE + 2);
-                                        ventana.getWindow().draw(brillo);
+                                        ventana.obtenerVentana().draw(brillo);
                                     }
                                 }
                             }
@@ -718,11 +718,11 @@ void Juego::jugar() {
                                         block.setOutlineThickness(2);
                                         block.setOutlineColor(sf::Color::Black);
                                         block.setPosition((piezaActual->x + j) * BLOCK_SIZE + 2, (piezaActual->y + i) * BLOCK_SIZE + 2);
-                                        ventana.getWindow().draw(block);
+                                        ventana.obtenerVentana().draw(block);
                                         sf::RectangleShape brillo(sf::Vector2f((BLOCK_SIZE-4) / 4, (BLOCK_SIZE-4) / 4));
                                         brillo.setFillColor(sf::Color(255, 255, 255, 150));
                                         brillo.setPosition((piezaActual->x + j) * BLOCK_SIZE + 2, (piezaActual->y + i) * BLOCK_SIZE + 2);
-                                        ventana.getWindow().draw(brillo);
+                                        ventana.obtenerVentana().draw(brillo);
                                     }
                             ventana.mostrar();
                             sf::sleep(sf::seconds(duracionParpadeo));
@@ -742,7 +742,7 @@ void Juego::jugar() {
                     puntaje += lineasEliminadas * 100;
                     nivel = 1 + puntaje / 1000;
                     delay = velocidadBase / nivel;
-                    nuevaPieza();
+                    crearNuevaPieza();
                 }
                 timer = 0;
             }
@@ -763,13 +763,13 @@ void Juego::jugar() {
                         block.setOutlineColor(sf::Color::Black);
 
                         block.setPosition(j * BLOCK_SIZE + 2, i * BLOCK_SIZE + 2);
-                        ventana.getWindow().draw(block);
+                        ventana.obtenerVentana().draw(block);
 
                         // Agregar brillo pixelado en la esquina superior izquierda
                         sf::RectangleShape brillo(sf::Vector2f((BLOCK_SIZE-4) / 4, (BLOCK_SIZE-4) / 4));
                         brillo.setFillColor(sf::Color(255, 255, 255, 150)); // Color blanco translúcido para el brillo
                         brillo.setPosition(j * BLOCK_SIZE + 2, i * BLOCK_SIZE + 2);
-                        ventana.getWindow().draw(brillo);
+                        ventana.obtenerVentana().draw(brillo);
                     }
                 }
             }
@@ -797,13 +797,13 @@ void Juego::jugar() {
                         block.setOutlineColor(sf::Color::Black);
 
                         block.setPosition((piezaActual->x + j) * BLOCK_SIZE + 2, (piezaActual->y + i) * BLOCK_SIZE + 2);
-                        ventana.getWindow().draw(block);
+                        ventana.obtenerVentana().draw(block);
 
                         // Agregar brillo pixelado en la esquina superior izquierda
                         sf::RectangleShape brillo(sf::Vector2f((BLOCK_SIZE-4) / 4, (BLOCK_SIZE-4) / 4));
                         brillo.setFillColor(sf::Color(255, 255, 255, 150)); // Color blanco translúcido para el brillo
                         brillo.setPosition((piezaActual->x + j) * BLOCK_SIZE + 2, (piezaActual->y + i) * BLOCK_SIZE + 2);
-                        ventana.getWindow().draw(brillo);
+                        ventana.obtenerVentana().draw(brillo);
                     }
 
             // Agregar un recuadro a la derecha del tablero y la UI lateral
@@ -823,7 +823,7 @@ void Juego::jugar() {
             textoPuntos.setPosition(Tablero::ANCHO * BLOCK_SIZE + BLOCK_SIZE + 3, BLOCK_SIZE + 63); // Ajuste de posición para mayor visibilidad
 
             // Dibujar el texto 'PUNTOS'
-            ventana.getWindow().draw(textoPuntos);
+            ventana.obtenerVentana().draw(textoPuntos);
 
             // Dibujar un recuadro pequeño más abajo del letrero de "PUNTOS"
             sf::RectangleShape recuadro(sf::Vector2f(120, 120)); // Tamaño del recuadro
@@ -831,7 +831,7 @@ void Juego::jugar() {
             recuadro.setOutlineThickness(2);
             recuadro.setOutlineColor(sf::Color::White); // Borde blanco
             recuadro.setPosition(Tablero::ANCHO * BLOCK_SIZE + BLOCK_SIZE + 10, 300); // Posición más abajo sin cambiar horizontalmente
-            ventana.getWindow().draw(recuadro);
+            ventana.obtenerVentana().draw(recuadro);
 
             // Dibujar un recuadro para mostrar los puntos acumulados
             sf::RectangleShape recuadroPuntos(sf::Vector2f(120, 50)); // Tamaño del recuadro
@@ -839,7 +839,7 @@ void Juego::jugar() {
             recuadroPuntos.setOutlineThickness(2);
             recuadroPuntos.setOutlineColor(sf::Color::White); // Borde blanco
             recuadroPuntos.setPosition(Tablero::ANCHO * BLOCK_SIZE + BLOCK_SIZE + 10, BLOCK_SIZE + 120); // Posición debajo del texto 'PUNTOS'
-            ventana.getWindow().draw(recuadroPuntos);
+            ventana.obtenerVentana().draw(recuadroPuntos);
 
             // Configurar y dibujar el texto de los puntos acumulados
             sf::Text textoAcumulado;
@@ -851,7 +851,7 @@ void Juego::jugar() {
             textoAcumulado.setPosition(Tablero::ANCHO * BLOCK_SIZE + BLOCK_SIZE + 40, BLOCK_SIZE + 130); // Posición dentro del recuadro
 
             // Dibujar el texto de los puntos acumulados
-            ventana.getWindow().draw(textoAcumulado);
+            ventana.obtenerVentana().draw(textoAcumulado);
 
             // Configurar y dibujar el texto 'SIG PIEZA'
             sf::Text textoSigPieza;
@@ -863,7 +863,7 @@ void Juego::jugar() {
             textoSigPieza.setPosition(Tablero::ANCHO * BLOCK_SIZE + BLOCK_SIZE + 5, 250); // Posición arriba del recuadro
 
             // Dibujar el texto 'SIG PIEZA'
-            ventana.getWindow().draw(textoSigPieza);
+            ventana.obtenerVentana().draw(textoSigPieza);
 
             // Configurar y dibujar el texto 'NIVEL'
             sf::Text textoNivel;
@@ -875,7 +875,7 @@ void Juego::jugar() {
             textoNivel.setPosition(Tablero::ANCHO * BLOCK_SIZE + BLOCK_SIZE + 40, 463); // Posición adecuada
 
             // Dibujar el texto 'NIVEL'
-            ventana.getWindow().draw(textoNivel);
+            ventana.obtenerVentana().draw(textoNivel);
 
             // Configurar y dibujar el texto del nivel actual
             sf::Text textoNivelActual;
@@ -887,7 +887,7 @@ void Juego::jugar() {
             textoNivelActual.setPosition(Tablero::ANCHO * BLOCK_SIZE + BLOCK_SIZE + 63.5, 512); // Posición debajo del texto 'NIVEL'
 
             // Dibujar el texto del nivel actual
-            ventana.getWindow().draw(textoNivelActual);
+            ventana.obtenerVentana().draw(textoNivelActual);
 
             // Dibujar la próxima pieza
             dibujarProximaPieza();
@@ -896,20 +896,20 @@ void Juego::jugar() {
         } else {
             if (enPausa) {
                 // Limpiar la ventana antes de dibujar
-                ventana.getWindow().clear();
+                ventana.obtenerVentana().clear();
 
                 // --- Dibuja la UI lateral durante el menú de pausa ---
                 dibujarUILateral(puntaje, nivel, fuente);
 
                 // Dibujar el menú de pausa centrado usando la fuente miembro
-                dibujarMenuPausa(ventana.getWindow(), fuente);
+                dibujarMenuPausa(ventana.obtenerVentana(), fuente);
 
-                ventana.getWindow().display();
+                ventana.obtenerVentana().display();
 
                 // Pausar el bucle hasta que se reanude
                 while (enPausa) {
                     sf::Event eventoPausa;
-                    while (ventana.obtenerEvento(eventoPausa)) {
+                    while (ventana.procesarEvento(eventoPausa)) {
                         if (eventoPausa.type == sf::Event::KeyPressed && eventoPausa.key.code == sf::Keyboard::Q) {
                             enPausa = false; // Reanudar el juego
                         }
@@ -936,11 +936,11 @@ void Juego::jugar() {
         sonidoGameOver.reproducir();
 
         // Mostrar la pantalla de Game Over
-        GameOverScreen gameOverScreen(ventana.getWindow());
+        GameOverScreen gameOverScreen(ventana.obtenerVentana());
         gameOverScreen.mostrar();
 
         // Esperar mientras se reproduce la música de GameOver
-        while (sonidoGameOver.estaReproduciendo()) {
+        while (sonidoGameOver.verificarSiEstaReproduciendo()) {
             sf::sleep(sf::milliseconds(100));
         }
 
@@ -960,28 +960,28 @@ void Juego::jugar() {
             textoRecord.setCharacterSize(36);
             textoRecord.setFillColor(sf::Color::Red);
             textoRecord.setStyle(sf::Text::Bold);
-            textoRecord.setPosition(ventana.getWindow().getSize().x / 2 - textoRecord.getLocalBounds().width / 2, ventana.getWindow().getSize().y / 2 - 120);
+            textoRecord.setPosition(ventana.obtenerVentana().getSize().x / 2 - textoRecord.getLocalBounds().width / 2, ventana.obtenerVentana().getSize().y / 2 - 120);
 
             sf::Text textoInstruccion;
             textoInstruccion.setFont(fuente);
             textoInstruccion.setString("Ingresa tu nombre:");
             textoInstruccion.setCharacterSize(24);
             textoInstruccion.setFillColor(sf::Color::White);
-            textoInstruccion.setPosition(ventana.getWindow().getSize().x / 2 - textoInstruccion.getLocalBounds().width / 2, ventana.getWindow().getSize().y / 2 - 70);
+            textoInstruccion.setPosition(ventana.obtenerVentana().getSize().x / 2 - textoInstruccion.getLocalBounds().width / 2, ventana.obtenerVentana().getSize().y / 2 - 70);
 
             // Recuadro para la entrada del nombre
             sf::RectangleShape recuadroNombre(sf::Vector2f(300, 50));
             recuadroNombre.setFillColor(sf::Color(0, 0, 0, 150)); // Fondo semitransparente
             recuadroNombre.setOutlineThickness(2);
             recuadroNombre.setOutlineColor(sf::Color::White);
-            recuadroNombre.setPosition(ventana.getWindow().getSize().x / 2 - recuadroNombre.getSize().x / 2, ventana.getWindow().getSize().y / 2);
+            recuadroNombre.setPosition(ventana.obtenerVentana().getSize().x / 2 - recuadroNombre.getSize().x / 2, ventana.obtenerVentana().getSize().y / 2);
 
             // Capturar el nombre del jugador
             std::string nombre;
             bool capturandoNombre = true;
             while (capturandoNombre) {
                 sf::Event event;
-                while (ventana.obtenerEvento(event)) {
+                while (ventana.procesarEvento(event)) {
                     if (event.type == sf::Event::TextEntered) {
                         if (event.text.unicode == '\n' || event.text.unicode == '\r') {
                             capturandoNombre = false; // Salir al presionar Enter
@@ -995,10 +995,10 @@ void Juego::jugar() {
                 }
 
                 // Actualizar la pantalla con el nombre ingresado
-                ventana.getWindow().clear();
-                ventana.getWindow().draw(textoRecord);
-                ventana.getWindow().draw(textoInstruccion);
-                ventana.getWindow().draw(recuadroNombre);
+                ventana.obtenerVentana().clear();
+                ventana.obtenerVentana().draw(textoRecord);
+                ventana.obtenerVentana().draw(textoInstruccion);
+                ventana.obtenerVentana().draw(recuadroNombre);
 
                 sf::Text textoNombre;
                 textoNombre.setFont(fuente);
@@ -1006,9 +1006,9 @@ void Juego::jugar() {
                 textoNombre.setCharacterSize(28);
                 textoNombre.setFillColor(sf::Color::Yellow);
                 textoNombre.setStyle(sf::Text::Italic);
-                textoNombre.setPosition(ventana.getWindow().getSize().x / 2 - textoNombre.getLocalBounds().width / 2, ventana.getWindow().getSize().y / 2 + 10);
-                ventana.getWindow().draw(textoNombre);
-                ventana.getWindow().display();
+                textoNombre.setPosition(ventana.obtenerVentana().getSize().x / 2 - textoNombre.getLocalBounds().width / 2, ventana.obtenerVentana().getSize().y / 2 + 10);
+                ventana.obtenerVentana().draw(textoNombre);
+                ventana.obtenerVentana().display();
             }
 
             // Guardar el nuevo récord y mantener los 5 mejores
