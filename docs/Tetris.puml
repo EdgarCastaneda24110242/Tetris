@@ -1,4 +1,4 @@
-@startuml TetrisDiagramaSimple
+@startuml Tetris
 
 !theme plain
 skinparam backgroundColor white
@@ -10,12 +10,8 @@ skinparam arrow {
 
 title TETRIS - DIAGRAMA DE CLASES SIMPLIFICADO\nArquitectura Principal del Proyecto
 
-' ===================================
-' === CLASES PRINCIPALES ===
-' ===================================
-
 class Juego {
-    - ventana : EjecutarVentana
+    - ventana : Ventana
     - tablero : Tablero
     - piezaActual : Pieza*
     - proximaPieza : Pieza*
@@ -32,9 +28,9 @@ class Juego {
 }
 
 class Tablero {
-    + ANCHO : int = 10
-    + ALTO : int = 20
-    + matriz : vector<vector<int>>
+    - ANCHO : int = 10
+    - ALTO : int = 20
+    - matriz : vector<vector<int>>
     __
     + Tablero()
     + VerificarColision(pieza : Pieza&) : bool
@@ -43,19 +39,20 @@ class Tablero {
 }
 
 class Pieza {
-    + tipo : int
-    + x : int
-    + y : int
-    + forma : vector<vector<int>>
+    - tipo : int
+    - rotacion : int
+    - x : int
+    - y : int
+    - forma : vector<vector<int>>
     __
     + Pieza(tipo : int)
     + Rotar() : void
 }
 
-class EjecutarVentana {
+class Ventana {
     - window : sf::RenderWindow*
     __
-    + EjecutarVentana(ancho : int, alto : int, titulo : string)
+    + Ventana(ancho : int, alto : int, titulo : string)
     + VerificarSiEstaAbierta() : bool
     + Limpiar() : void
     + Mostrar() : void
@@ -82,14 +79,10 @@ class Audio {
     + EstablecerVolumen(volumen : float) : void
 }
 
-' ===================================
-' === CLASES DE UTILIDAD ===
-' ===================================
-
-class Puntos {
+class Puntaje {
     - puntaje : int
     __
-    + Puntos()
+    + Puntaje()
     + AgregarPuntos(lineas : int) : void
     + CalcularPuntaje() : int
     + Reiniciar() : void
@@ -116,10 +109,6 @@ enum Accion {
     Salir
 }
 
-' ===================================
-' === CLASES DE RENDERIZADO ===
-' ===================================
-
 class TableroRender {
     __
     + DibujarFondo(...) : void
@@ -142,6 +131,15 @@ class ColorPieza {
     + Obtener(tipo : int) : sf::Color
 }
 
+class Constantes {
+    - BLOCK_SIZE : int = 30
+    - WIN_WIDTH : int = 800
+    - WIN_HEIGHT : int = 600
+    - BOARD_OFFSET_X : int = 50
+    - BOARD_OFFSET_Y : int = 50
+    - SCALE : float = 1.0
+}
+
 class Tetris {
     - tablero : Tablero
     - piezaActual : Pieza*
@@ -152,28 +150,34 @@ class Tetris {
     + CrearNuevaPieza() : void
 }
 
-' ===================================
-' === RELACIONES PRINCIPALES ===
-' ===================================
-
-Juego "1" --> "1" Tablero
-Juego "1" --> "1" EjecutarVentana  
-Juego "1" --> "1" Musica
-Juego "1" --> "0..2" Pieza
-Juego "1" --> "1" GameOverScreen
-Juego "1" --> "*" Audio
-Juego "1" --> "1" Puntos
-Juego "1" --> "1" Controles
-
-Tetris "1" --> "1" Pieza
-
-TableroRender "1" --> "1" Tablero
-TableroRender "1" --> "*" Pieza
-TableroRender "1" --> "*" Bloque
-TableroRender "1" --> "1" ColorPieza
-TableroRender "1" --> "1" FondoTablero
-
-Tablero "1" --> "*" Pieza
-Controles "1" --> "1" Accion
+Juego *-- Tablero
+Juego *-- Ventana
+Juego *-- Musica
+Tetris *-- Tablero
+Juego o-- Pieza
+Juego o-- GameOverScreen
+Juego o-- Audio
+Juego o-- Puntaje
+Juego o-- Controles
+Juego o-- ColorPieza
+Tetris o-- Pieza
+Tetris o-- Ventana
+Tetris o-- Controles
+Tetris o-- ColorPieza
+Tetris o-- TableroRender
+Tetris o-- FondoTablero
+Tetris o-- Audio
+TableroRender o-- Tablero
+TableroRender o-- Pieza
+TableroRender o-- Bloque
+TableroRender o-- ColorPieza
+TableroRender o-- FondoTablero
+Tablero o-- Pieza
+Tablero o-- Constantes
+FondoTablero o-- Constantes
+GameOverScreen o-- Ventana
+Controles o-- Accion
+TableroRender o-- Bloque
+Tetris o-- Bloque
 
 @enduml

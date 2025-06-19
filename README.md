@@ -100,7 +100,7 @@ Muestra los 5 mejores puntajes alcanzados, guardados automáticamente en el arch
 #### Menú Principal
 Al iniciar el juego, te encontrarás con el menú principal que presenta una interfaz atractiva con fondo animado:
 
-![Menú Principal de Tetris](docs/images/tetris-menu.png)
+<img src="docs/images/tetris-menu.png" alt="Menú Principal de Tetris" width="50%" />
 
 **Elementos de la interfaz:**
 - **Título estilizado**: "TETRIS" en fuente pixel art con efecto 3D
@@ -120,7 +120,7 @@ Al iniciar el juego, te encontrarás con el menú principal que presenta una int
 #### Iniciando una Partida
 Para comenzar a jugar, selecciona la opción **"Jugar"** del menú principal:
 
-![Opción para empezar a jugar](assets/images/opcion-jugar.png)
+<img src="docs/images/opcion-jugar.png" alt="Opción para empezar a jugar" width="50%" />
 
 **Pasos para iniciar:**
 1. **Navega** hasta la opción "Jugar" usando las teclas **W/S**
@@ -138,7 +138,7 @@ Una vez que selecciones "Jugar", el juego:
 #### Pantalla de Juego
 Una vez que inicies una partida, verás la interfaz principal del juego:
 
-![Pantalla de juego](assets/images/pantalla-juego.png)
+<img src="docs/images/pantalla-juego.png" alt="Pantalla de juego" width="50%" />
 
 **Elementos de la interfaz de juego:**
 
@@ -165,7 +165,7 @@ Una vez que inicies una partida, verás la interfaz principal del juego:
 #### Pantalla de Pausa
 Durante cualquier partida, puedes pausar el juego presionando la tecla **Q**. Esto te llevará al menú de pausa:
 
-![Pantalla de pausa](assets/images/Pantalla de pausa.png)
+<img src="docs/images/pantalla-pausa.png" alt="Pantalla de pausa" width="50%" />
 
 **Opciones disponibles en pausa:**
 - **[Q] Reanudar**: Continúa la partida exactamente donde la dejaste
@@ -187,7 +187,7 @@ Durante cualquier partida, puedes pausar el juego presionando la tecla **Q**. Es
 #### Pantalla de Récords
 Para ver los mejores puntajes alcanzados, selecciona la opción **"Scores"** del menú principal:
 
-![Opción Records](assets/images/opcion-records.png)
+<img src="docs/images/opcion-records.png" alt="Opción Records" width="50%" />
 
 **Visualización de los mejores puntajes:**
 - **Top 5 récords**: Muestra los 5 mejores puntajes de todos los tiempos
@@ -207,6 +207,23 @@ Para ver los mejores puntajes alcanzados, selecciona la opción **"Scores"** del
 3. **Sobrevive** a niveles más altos para multiplicar tu puntuación
 4. **Al finalizar** la partida, tu puntaje se compara automáticamente con los récords existentes
 5. **Si calificas**, tu nuevo récord aparecerá en la lista la próxima vez que veas los "Scores"
+
+**Vista de la pantalla de records:**
+
+<img src="docs/images/Records.png" alt="Pantalla de Records" width="50%" />
+
+Esta pantalla muestra la lista completa de los 5 mejores puntajes guardados, ordenados de mayor a menor puntuación.
+
+#### Opción Salir
+Para cerrar el juego, selecciona la opción **"Salir"** del menú principal:
+
+<img src="docs/images/opcion-salir.png" alt="Opción Salir" width="50%" />
+
+**Función de la opción salir:**
+- **Cierre seguro**: Termina la aplicación de manera controlada
+- **Guardado automático**: Asegura que todos los records y configuraciones se guarden
+- **Confirmación**: Al seleccionar esta opción, el juego se cierra inmediatamente
+- **Alternativa**: También puedes usar **Alt+F4** o cerrar la ventana directamente
 
 #### Durante el Juego
 - **Área de juego**: Tablero principal de 10x20 donde caen las piezas

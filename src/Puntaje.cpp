@@ -1,8 +1,8 @@
-#include "../include/Puntos.hpp"
+#include "../include/Puntaje.hpp"
 
-Puntos::Puntos() : puntaje(0) {}
+Puntaje::Puntaje() : puntaje(0) {}
 
-void Puntos::AgregarPuntos(int lineas)
+void Puntaje::AgregarPuntos(int lineas)
 {
     // Asigna puntos según el número de líneas completadas
     switch (lineas)
@@ -24,12 +24,12 @@ void Puntos::AgregarPuntos(int lineas)
     }
 }
 
-int Puntos::CalcularPuntaje() const
+int Puntaje::CalcularPuntaje() const
 {
     return puntaje;
 }
 
-void Puntos::Reiniciar()
+void Puntaje::Reiniciar()
 {
     puntaje = 0;
 }
