@@ -1,0 +1,295 @@
+@startuml TetrisDiagramaCompleto
+
+!theme plain
+skinparam backgroundColor white
+skinparam classBackgroundColor #E8F4F8
+skinparam classBorderColor #2E86AB
+skinparam arrow {
+    Color #2E86AB
+}
+
+title TETRIS - DIAGRAMA DE CLASES COMPLETO\nArquitectura Detallada del Proyecto
+
+' ===================================
+' === CLASE PRINCIPAL DEL JUEGO ===
+' ===================================
+
+class Juego {
+    - ventana : EjecutarVentana
+    - tablero : Tablero
+    - piezaActual : Pieza*
+    - proximaPieza : Pieza*
+    - gameOver : bool
+    - puntaje : int
+    - nivel : int
+    - fuente : sf::Font
+    - textoPuntaje : sf::Text
+    - texturaPiezas : sf::Texture
+    - musica : Musica
+    __
+    + Juego(ventanaPrincipal : sf::RenderWindow&)
+    + Jugar() : void
+    - CrearNuevaPieza() : void
+    - ActualizarPuntaje() : void
+    - DibujarProximaPieza() : void
+    - DibujarUILateral(puntos : int, nivel : int, fuente : sf::Font&) : void
+    + MostrarMenuPrincipal() : void
+    + MostrarRecords() : void
+    - CargarRecords() : vector<pair<int,string>>
+    - GuardarRecord(puntaje : int) : void
+}
+
+' ===================================
+' === GESTIÓN DE VENTANA Y RENDERIZADO ===
+' ===================================
+
+class EjecutarVentana {
+    - window : sf::RenderWindow*
+    __
+    + EjecutarVentana(ancho : int, alto : int, titulo : string)
+    + EjecutarVentana(ventanaExistente : sf::RenderWindow&)
+    + VerificarSiEstaAbierta() : bool
+    + Limpiar() : void
+    + Mostrar() : void
+    + ProcesarEvento(evento : sf::Event&) : bool
+    + ObtenerVentana() : sf::RenderWindow&
+}
+
+class TableroRender {
+    __
+    + DibujarFondo(ventana : sf::RenderWindow&, tablero : Tablero&) : void
+    + DibujarTablero(ventana : sf::RenderWindow&, tablero : Tablero&) : void
+    + DibujarPieza(ventana : sf::RenderWindow&, pieza : Pieza&) : void
+    + DibujarBloque(ventana : sf::RenderWindow&, x : int, y : int, color : sf::Color) : void
+}
+
+class FondoTablero {
+    __
+    + Dibujar(ventana : sf::RenderWindow&) : void
+    + DibujarPatron(ventana : sf::RenderWindow&) : void
+}
+
+' ===================================
+' === LÓGICA DEL TABLERO Y PIEZAS ===
+' ===================================
+
+class Tablero {
+    + ANCHO : int = 10
+    + ALTO : int = 20
+    + matriz : vector<vector<int>>
+    __
+    + Tablero()
+    + VerificarColision(pieza : Pieza&, desplazamientoX : int, desplazamientoY : int) : bool
+    + FijarPieza(pieza : Pieza&) : void
+    + LimpiarLineas(ventana : sf::RenderWindow&) : int
+    + VerificarLineasCompletas() : vector<int>
+    + EliminarLinea(linea : int) : void
+    + VerificarGameOver() : bool
+    + Reiniciar() : void
+}
+
+class Pieza {
+    + tipo : int
+    + x : int
+    + y : int
+    + forma : vector<vector<int>>
+    + colores : vector<sf::Color>
+    __
+    + Pieza(tipo : int)
+    + Rotar() : void
+    + RotarAntihorario() : void
+    + Mover(dx : int, dy : int) : void
+    + ObtenerForma() : vector<vector<int>>
+    + ObtenerColor() : sf::Color
+    + Clonar() : Pieza*
+    - InicializarForma() : void
+    - InicializarColores() : void
+}
+
+' ===================================
+' === AUDIO Y MULTIMEDIA ===
+' ===================================
+
+class Musica {
+    - musica : sf::Music
+    - rutaArchivo : string
+    - volumen : float
+    __
+    + Musica(rutaArchivo : string)
+    + Reproducir() : void
+    + Detener() : void
+    + Pausar() : void
+    + Reanudar() : void
+    + EstablecerVolumen(volumen : float) : void
+    + VerificarSiEstaReproduciendo() : bool
+    + Destruir() : void
+}
+
+class Audio {
+    - buffer : sf::SoundBuffer
+    - sonido : sf::Sound
+    - musica : sf::Music
+    - volumen : float
+    __
+    + Audio(rutaArchivo : string)
+    + Reproducir() : void
+    + ReproducirMusica() : void
+    + DetenerMusica() : void
+    + PausarMusica() : void
+    + VerificarSiEstaReproduciendo() : bool
+    + EstablecerVolumen(volumen : float) : void
+}
+
+' ===================================
+' === CONTROLES Y EVENTOS ===
+' ===================================
+
+class Controles {
+    __
+    + ProcesarEvento(evento : sf::Event&) : Accion
+    + ProcesarTeclado(codigo : sf::Keyboard::Key) : Accion
+    + VerificarTeclaPresionada(tecla : sf::Keyboard::Key) : bool
+}
+
+enum Accion {
+    Ninguna
+    MoverIzquierda
+    MoverDerecha
+    Bajar
+    Rotar
+    Pausar
+    Salir
+    Confirmar
+    SubirMenu
+    BajarMenu
+}
+
+' ===================================
+' === SISTEMA DE PUNTUACIÓN ===
+' ===================================
+
+class Puntos {
+    - puntaje : int
+    - multiplicador : float
+    __
+    + Puntos()
+    + AgregarPuntos(lineas : int, nivel : int) : void
+    + CalcularPuntaje(lineas : int, nivel : int) : int
+    + ObtenerPuntaje() : int
+    + Reiniciar() : void
+    + EstablecerMultiplicador(multiplicador : float) : void
+}
+
+' ===================================
+' === PANTALLAS Y UI ===
+' ===================================
+
+class GameOverScreen {
+    - ventana : sf::RenderWindow&
+    - fuente : sf::Font
+    - textoGameOver : sf::Text
+    - textoPuntaje : sf::Text
+    __
+    + GameOverScreen(ventana : sf::RenderWindow&)
+    + Mostrar(puntajeFinal : int) : void
+    + MostrarAnimacion() : void
+    + EsperarReinicio() : bool
+}
+
+class PantallaInicio {
+    - ventana : sf::RenderWindow&
+    - fuente : sf::Font
+    - opcionSeleccionada : int
+    __
+    + PantallaInicio(ventana : sf::RenderWindow&)
+    + Mostrar() : int
+    + ProcesarEventos() : void
+    + DibujarMenu() : void
+}
+
+' ===================================
+' === UTILIDADES Y HELPERS ===
+' ===================================
+
+class Bloque {
+    + x : int
+    + y : int
+    + color : sf::Color
+    __
+    + Bloque(x : int, y : int, color : sf::Color)
+    + Dibujar(ventana : sf::RenderWindow&) : void
+    + EstablecerPosicion(x : int, y : int) : void
+    + EstablecerColor(color : sf::Color) : void
+}
+
+class ColorPieza {
+    - colores : vector<sf::Color>
+    __
+    + Obtener(tipo : int) : sf::Color
+    + ObtenerAleatorio() : sf::Color
+    - InicializarColores() : void
+}
+
+class Tetris {
+    - tablero : Tablero
+    - piezaActual : Pieza*
+    - gameOver : bool
+    - puntos : Puntos
+    __
+    + Tetris()
+    + IniciarJuego() : void
+    + Jugar() : void
+    + CrearNuevaPieza() : void
+    + VerificarEstadoJuego() : bool
+    + Reiniciar() : void
+}
+
+' ===================================
+' === CONSTANTES Y CONFIGURACIÓN ===
+' ===================================
+
+class Constantes {
+    + ANCHO_VENTANA : int = 800
+    + ALTO_VENTANA : int = 600
+    + TAMAÑO_BLOQUE : int = 30
+    + VELOCIDAD_INICIAL : float = 1.0
+    + VELOCIDAD_RAPIDA : float = 0.05
+    + TIPOS_PIEZA : int = 7
+    + MAX_RECORDS : int = 5
+    __
+}
+
+' ===================================
+' === RELACIONES PRINCIPALES ===
+' ===================================
+
+Juego "1" --> "1" EjecutarVentana
+Juego "1" --> "1" Tablero  
+Juego "1" --> "1" Musica
+Juego "1" --> "0..2" Pieza
+Juego "1" --> "1" GameOverScreen
+Juego "1" --> "*" Audio
+Juego "1" --> "1" Puntos
+Juego "1" --> "1" Controles
+
+Tetris "1" --> "1" Tablero
+Tetris "1" --> "1" Pieza
+Tetris "1" --> "1" Puntos
+
+TableroRender "1" --> "1" Tablero
+TableroRender "1" --> "*" Pieza
+TableroRender "1" --> "*" Bloque
+TableroRender "1" --> "1" ColorPieza
+TableroRender "1" --> "1" FondoTablero
+
+Tablero "1" --> "*" Pieza
+Controles "1" --> "1" Accion
+PantallaInicio "1" --> "1" EjecutarVentana
+GameOverScreen "1" --> "1" EjecutarVentana
+
+Pieza "1" --> "1" ColorPieza
+Puntos "1" --> "1" Constantes
+Audio "1" --> "1" Constantes
+Musica "1" --> "1" Constantes
+
+@enduml

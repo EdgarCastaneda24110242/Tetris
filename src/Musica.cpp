@@ -1,35 +1,45 @@
 #include "Musica.hpp"
 #include <iostream>
 
-Musica::Musica(const std::string& rutaArchivo) {
-    if (!musica.openFromFile(rutaArchivo)) {
+Musica::Musica(const std::string &rutaArchivo)
+{
+    if (!musica.openFromFile(rutaArchivo))
+    {
         // std::cerr << "Error: No se pudo cargar la música desde " << rutaArchivo << std::endl;
-    } else {
+    }
+    else
+    {
         musica.setLoop(true); // Repetir en bucle
     }
 }
 
-void Musica::reproducir() {
+void Musica::Reproducir()
+{
     musica.play();
 }
 
-void Musica::detener() {
+void Musica::Detener()
+{
     musica.stop();
 }
 
-void Musica::pausar() {
+void Musica::Pausar()
+{
     musica.pause();
 }
 
-void Musica::reanudar() {
+void Musica::Reanudar()
+{
     if (musica.getStatus() == sf::Music::Paused)
         musica.play();
 }
 
-bool Musica::verificarSiEstaReproduciendo() const {
+bool Musica::VerificarSiEstaReproduciendo() const
+{
     return musica.getStatus() == sf::Music::Playing;
 }
 
-void Musica::establecerVolumen(float volumen) {
+void Musica::EstablecerVolumen(float volumen)
+{
     musica.setVolume(volumen);
 }

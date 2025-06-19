@@ -1,7 +1,8 @@
 #pragma once
 #include <vector>
 
-class Pieza {
+class Pieza
+{
 public:
     int tipo;
     int rotacion;
@@ -9,5 +10,5 @@ public:
     std::vector<std::vector<int>> forma;
 
     Pieza(int tipo);
-    void rotar();
+    void Rotar();
 };

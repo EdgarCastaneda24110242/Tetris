@@ -18,17 +18,22 @@ const int WIN_HEIGHT = BOARD_OFFSET_Y + Tablero::ALTO * BLOCK_SIZE * SCALE + PAN
 
 Tetris::Tetris() : tablero(), piezaActual(nullptr), gameOver(false) {}
 
-void Tetris::crearNuevaPieza() {
-    if (piezaActual) delete piezaActual;
+void Tetris::CrearNuevaPieza()
+{
+    if (piezaActual)
+        delete piezaActual;
     piezaActual = new Pieza(rand() % 7);
-    piezaActual->x = 3; piezaActual->y = 0;
-    if (tablero.colision(*piezaActual)) gameOver = true;
+    piezaActual->x = 3;
+    piezaActual->y = 0;
+    if (tablero.VerificarColision(*piezaActual))
+        gameOver = true;
 }
 
-void Tetris::jugar() {
+void Tetris::Jugar()
+{
     // Crear una instancia de la clase Audio y reproducir la música
     Audio audio("assets/music/Tetris.ogg");
-    audio.reproducir();
+    audio.Reproducir();
 
     Ventana ventana(WIN_WIDTH, WIN_HEIGHT, "Tetris NES Style");
     sf::Font font;
@@ -36,30 +41,34 @@ void Tetris::jugar() {
 
     // Pantalla de inicio
     bool inicio = true;
-    while (inicio && ventana.verificarSiEstaAbierta()) {
-        ventana.limpiar();
-        FondoTablero::dibujar(ventana.obtenerVentana(), WIN_WIDTH, WIN_HEIGHT, BOARD_OFFSET_X, BOARD_OFFSET_Y, Tablero::ANCHO * BLOCK_SIZE, Tablero::ALTO * BLOCK_SIZE, SCALE);
+    while (inicio && ventana.VerificarSiEstaAbierta())
+    {
+        ventana.Limpiar();
+        FondoTablero::Dibujar(ventana.ObtenerVentana(), WIN_WIDTH, WIN_HEIGHT, BOARD_OFFSET_X, BOARD_OFFSET_Y, Tablero::ANCHO * BLOCK_SIZE, Tablero::ALTO * BLOCK_SIZE, SCALE);
 
         sf::Text titulo("TETRIS", font, 80);
         titulo.setFillColor(sf::Color(255, 255, 255));
         titulo.setStyle(sf::Text::Bold);
-        titulo.setPosition(WIN_WIDTH/2 - titulo.getGlobalBounds().width/2, 80);
-        ventana.obtenerVentana().draw(titulo);
+        titulo.setPosition(WIN_WIDTH / 2 - titulo.getGlobalBounds().width / 2, 80);
+        ventana.ObtenerVentana().draw(titulo);
 
         sf::Text press("Presiona ENTER para jugar", font, 32);
         press.setFillColor(sf::Color(200, 200, 200));
-        press.setPosition(WIN_WIDTH/2 - press.getGlobalBounds().width/2, WIN_HEIGHT/2 + 60);
-        ventana.obtenerVentana().draw(press);
+        press.setPosition(WIN_WIDTH / 2 - press.getGlobalBounds().width / 2, WIN_HEIGHT / 2 + 60);
+        ventana.ObtenerVentana().draw(press);
 
-        ventana.mostrar();
+        ventana.Mostrar();
 
         sf::Event e;
-        while (ventana.procesarEvento(e)) {
-            if (e.type == sf::Event::Closed) {
-                ventana.obtenerVentana().close();
+        while (ventana.ProcesarEvento(e))
+        {
+            if (e.type == sf::Event::Closed)
+            {
+                ventana.ObtenerVentana().close();
                 return;
             }
-            if (e.type == sf::Event::KeyPressed && e.key.code == sf::Keyboard::Enter) {
+            if (e.type == sf::Event::KeyPressed && e.key.code == sf::Keyboard::Enter)
+            {
                 inicio = false;
             }
         }
@@ -67,30 +76,64 @@ void Tetris::jugar() {
 
     sf::Clock clock;
     float timer = 0, delay = 0.5;
-    std::vector<int> lineasAnimadas; int animFrames = 0, FRAMES = 12;
-    crearNuevaPieza();
+    std::vector<int> lineasAnimadas;
+    int animFrames = 0, FRAMES = 12;
+    CrearNuevaPieza();
 
-    while (ventana.verificarSiEstaAbierta() && !gameOver) {
-        float time = clock.restart().asSeconds(); timer += time;
+    while (ventana.VerificarSiEstaAbierta() && !gameOver)
+    {
+        float time = clock.restart().asSeconds();
+        timer += time;
         sf::Event e;
-        while (ventana.procesarEvento(e)) {
-            if (e.type == sf::Event::Closed) ventana.obtenerVentana().close();
-            Controles::Accion a = Controles::procesarEvento(e);
-            if (a == Controles::MoverIzquierda) { piezaActual->x--; if (tablero.colision(*piezaActual)) piezaActual->x++; }
-            if (a == Controles::MoverDerecha) { piezaActual->x++; if (tablero.colision(*piezaActual)) piezaActual->x--; }
-            if (a == Controles::Bajar) { piezaActual->y++; if (tablero.colision(*piezaActual)) { piezaActual->y--; tablero.fijarPieza(*piezaActual); tablero.limpiarLineas(ventana.obtenerVentana()); crearNuevaPieza(); } }
-            if (a == Controles::Rotar) { piezaActual->rotar(); if (tablero.colision(*piezaActual)) piezaActual->rotar(); }
-            if (a == Controles::Salir) ventana.obtenerVentana().close();
+        while (ventana.ProcesarEvento(e))
+        {
+            if (e.type == sf::Event::Closed)
+                ventana.ObtenerVentana().close();
+            Controles::Accion a = Controles::ProcesarEvento(e);
+            if (a == Controles::MoverIzquierda)
+            {
+                piezaActual->x--;
+                if (tablero.VerificarColision(*piezaActual))
+                    piezaActual->x++;
+            }
+            if (a == Controles::MoverDerecha)
+            {
+                piezaActual->x++;
+                if (tablero.VerificarColision(*piezaActual))
+                    piezaActual->x--;
+            }
+            if (a == Controles::Bajar)
+            {
+                piezaActual->y++;
+                if (tablero.VerificarColision(*piezaActual))
+                {
+                    piezaActual->y--;
+                    tablero.FijarPieza(*piezaActual);
+                    tablero.LimpiarLineas(ventana.ObtenerVentana());
+                    CrearNuevaPieza();
+                }
+            }
+            if (a == Controles::Rotar)
+            {
+                piezaActual->Rotar();
+                if (tablero.VerificarColision(*piezaActual))
+                    piezaActual->Rotar();
+            }
+            if (a == Controles::Salir)
+                ventana.ObtenerVentana().close();
         }
 
-        if (animFrames > 0) {
-            ventana.limpiar();
-            TableroRender::dibujarFondo(ventana.obtenerVentana(), WIN_WIDTH, WIN_HEIGHT, BOARD_OFFSET_X, BOARD_OFFSET_Y, Tablero::ANCHO*BLOCK_SIZE, Tablero::ALTO*BLOCK_SIZE, SCALE);
-            TableroRender::dibujarTablero(ventana.obtenerVentana(), tablero, BOARD_OFFSET_X, BOARD_OFFSET_Y, BLOCK_SIZE, SCALE, lineasAnimadas, animFrames, FRAMES);
-            TableroRender::dibujarPieza(ventana.obtenerVentana(), *piezaActual, BOARD_OFFSET_X, BOARD_OFFSET_Y, BLOCK_SIZE, SCALE);
-            ventana.mostrar();
-            if (--animFrames == 0) {
-                for (int idx : lineasAnimadas) {
+        if (animFrames > 0)
+        {
+            ventana.Limpiar();
+            TableroRender::DibujarFondo(ventana.ObtenerVentana(), WIN_WIDTH, WIN_HEIGHT, BOARD_OFFSET_X, BOARD_OFFSET_Y, Tablero::ANCHO * BLOCK_SIZE, Tablero::ALTO * BLOCK_SIZE, SCALE);
+            TableroRender::DibujarTablero(ventana.ObtenerVentana(), tablero, BOARD_OFFSET_X, BOARD_OFFSET_Y, BLOCK_SIZE, SCALE, lineasAnimadas, animFrames, FRAMES);
+            TableroRender::DibujarPieza(ventana.ObtenerVentana(), *piezaActual, BOARD_OFFSET_X, BOARD_OFFSET_Y, BLOCK_SIZE, SCALE);
+            ventana.Mostrar();
+            if (--animFrames == 0)
+            {
+                for (int idx : lineasAnimadas)
+                {
                     tablero.matriz.erase(tablero.matriz.begin() + idx);
                     tablero.matriz.insert(tablero.matriz.begin(), std::vector<int>(Tablero::ANCHO, 0));
                 }
@@ -99,30 +142,42 @@ void Tetris::jugar() {
             continue;
         }
 
-        if (timer > delay) {
+        if (timer > delay)
+        {
             piezaActual->y++;
-            if (tablero.colision(*piezaActual)) {
+            if (tablero.VerificarColision(*piezaActual))
+            {
                 piezaActual->y--;
-                tablero.fijarPieza(*piezaActual);
+                tablero.FijarPieza(*piezaActual);
                 lineasAnimadas.clear();
-                for (int i=0; i<Tablero::ALTO; ++i) {
+                for (int i = 0; i < Tablero::ALTO; ++i)
+                {
                     bool llena = true;
-                    for (int j=0; j<Tablero::ANCHO; ++j) if (!tablero.matriz[i][j]) { llena = false; break; }
-                    if (llena) lineasAnimadas.push_back(i);
+                    for (int j = 0; j < Tablero::ANCHO; ++j)
+                        if (!tablero.matriz[i][j])
+                        {
+                            llena = false;
+                            break;
+                        }
+                    if (llena)
+                        lineasAnimadas.push_back(i);
                 }
-                if (!lineasAnimadas.empty()) animFrames = FRAMES;
-                else tablero.limpiarLineas(ventana.obtenerVentana());
-                crearNuevaPieza();
+                if (!lineasAnimadas.empty())
+                    animFrames = FRAMES;
+                else
+                    tablero.LimpiarLineas(ventana.ObtenerVentana());
+                CrearNuevaPieza();
             }
             timer = 0;
         }
 
-        if (animFrames == 0) {
-            ventana.limpiar();
-            TableroRender::dibujarFondo(ventana.obtenerVentana(), WIN_WIDTH, WIN_HEIGHT, BOARD_OFFSET_X, BOARD_OFFSET_Y, Tablero::ANCHO*BLOCK_SIZE, Tablero::ALTO*BLOCK_SIZE, SCALE);
-            TableroRender::dibujarTablero(ventana.obtenerVentana(), tablero, BOARD_OFFSET_X, BOARD_OFFSET_Y, BLOCK_SIZE, SCALE);
-            TableroRender::dibujarPieza(ventana.obtenerVentana(), *piezaActual, BOARD_OFFSET_X, BOARD_OFFSET_Y, BLOCK_SIZE, SCALE);
-            ventana.mostrar();
+        if (animFrames == 0)
+        {
+            ventana.Limpiar();
+            TableroRender::DibujarFondo(ventana.ObtenerVentana(), WIN_WIDTH, WIN_HEIGHT, BOARD_OFFSET_X, BOARD_OFFSET_Y, Tablero::ANCHO * BLOCK_SIZE, Tablero::ALTO * BLOCK_SIZE, SCALE);
+            TableroRender::DibujarTablero(ventana.ObtenerVentana(), tablero, BOARD_OFFSET_X, BOARD_OFFSET_Y, BLOCK_SIZE, SCALE);
+            TableroRender::DibujarPieza(ventana.ObtenerVentana(), *piezaActual, BOARD_OFFSET_X, BOARD_OFFSET_Y, BLOCK_SIZE, SCALE);
+            ventana.Mostrar();
         }
     }
     delete piezaActual;

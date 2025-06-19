@@ -4,13 +4,14 @@
 #include <SFML/Graphics.hpp>
 #include <vector>
 
-class GameOverScreen {
+class GameOverScreen
+{
 public:
-    explicit GameOverScreen(sf::RenderWindow& ventana);
-    void mostrar();
+    explicit GameOverScreen(sf::RenderWindow &ventana);
+    void Mostrar();
 
 private:
-    sf::RenderWindow& ventana;
+    sf::RenderWindow &ventana;
 };
 
 #endif

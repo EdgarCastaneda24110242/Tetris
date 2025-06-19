@@ -2,13 +2,15 @@
 #include "Tablero.hpp"
 #include "Pieza.hpp"
 
-class Tetris {
+class Tetris
+{
 public:
     Tetris();
-    void jugar();
+    void Jugar();
+
 private:
     Tablero tablero;
-    Pieza* piezaActual;
+    Pieza *piezaActual;
     bool gameOver;
-    void crearNuevaPieza();
+    void CrearNuevaPieza();
 };

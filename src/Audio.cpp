@@ -2,29 +2,37 @@
 #include <stdexcept>
 #include <iostream>
 
-Audio::Audio(const std::string& rutaArchivo) {
+Audio::Audio(const std::string &rutaArchivo)
+{
     // std::cout << "Intentando cargar el archivo de audio: " << rutaArchivo << std::endl;
-    if (!musica.openFromFile(rutaArchivo)) {
+    if (!musica.openFromFile(rutaArchivo))
+    {
         throw std::runtime_error("No se pudo cargar el archivo de audio: " + rutaArchivo);
     }
     // std::cout << "Archivo de audio cargado correctamente." << std::endl;
     musica.setVolume(100); // Establece el volumen al 100%
 }
 
-void Audio::reproducir() {
+void Audio::Reproducir()
+{
     // std::cout << "Reproduciendo audio..." << std::endl;
     musica.play();
-    if (musica.getStatus() == sf::Music::Playing) {
+    if (musica.getStatus() == sf::Music::Playing)
+    {
         // std::cout << "El audio se está reproduciendo correctamente." << std::endl;
-    } else {
+    }
+    else
+    {
         // std::cout << "El audio no se está reproduciendo." << std::endl;
     }
 }
 
-bool Audio::verificarSiEstaReproduciendo() const {
+bool Audio::VerificarSiEstaReproduciendo() const
+{
     return musica.getStatus() == sf::Music::Playing;
 }
 
-void Audio::establecerVolumen(float volumen) {
+void Audio::EstablecerVolumen(float volumen)
+{
     musica.setVolume(volumen);
 }

@@ -8,9 +8,11 @@
 //   - W: Rotar pieza
 //   - Q: Salir del juego
 
-class Controles {
+class Controles
+{
 public:
-    enum Accion {
+    enum Accion
+    {
         Ninguna,
         MoverIzquierda,
         MoverDerecha,
@@ -19,5 +21,5 @@ public:
         Salir
     };
 
-    static Accion procesarEvento(const sf::Event& evento);
+    static Accion ProcesarEvento(const sf::Event &evento);
 };

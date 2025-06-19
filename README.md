@@ -8,6 +8,7 @@ Un juego de **Tetris** clásico desarrollado en **C++** utilizando la biblioteca
 - [Características](#características)
 - [Controles](#controles)
 - [Menús del Juego](#menús-del-juego)
+- [Manual de Usuario](#manual-de-usuario)
 - [Requisitos del Sistema](#requisitos-del-sistema)
 - [Instalación y Configuración](#instalación-y-configuración)
 - [Compilación y Ejecución](#compilación-y-ejecución)
@@ -92,16 +93,140 @@ Características del menú de pausa:
 ### Pantalla de Récords
 Muestra los 5 mejores puntajes alcanzados, guardados automáticamente en el archivo `record.txt`.
 
+## Manual de Usuario
+
+### Interfaz del Juego
+
+#### Menú Principal
+Al iniciar el juego, te encontrarás con el menú principal que presenta una interfaz atractiva con fondo animado:
+
+![Menú Principal de Tetris](docs/images/tetris-menu.png)
+
+**Elementos de la interfaz:**
+- **Título estilizado**: "TETRIS" en fuente pixel art con efecto 3D
+- **Créditos**: "by Fer and Edgar" 
+- **Opciones de navegación**:
+  - **Jugar**: Comienza una nueva partida
+  - **Scores**: Visualiza la tabla de récords
+  - **Salir**: Cierra la aplicación
+- **Piezas animadas**: Tetrominós cayendo en el fondo para ambiente dinámico
+
+**Cómo usar el menú:**
+1. Usa las teclas **W/S** o las **flechas arriba/abajo** para navegar
+2. La opción seleccionada se resalta en color amarillo
+3. Presiona **Enter** para confirmar tu selección
+4. La música de fondo crea un ambiente inmersivo
+
+#### Iniciando una Partida
+Para comenzar a jugar, selecciona la opción **"Jugar"** del menú principal:
+
+![Opción para empezar a jugar](assets/images/opcion-jugar.png)
+
+**Pasos para iniciar:**
+1. **Navega** hasta la opción "Jugar" usando las teclas **W/S**
+2. **Observa** cómo la opción se resalta en **color amarillo** cuando está seleccionada
+3. **Presiona Enter** para confirmar y comenzar una nueva partida
+4. **Escucha** el sonido especial de inicio que marca el comienzo del juego
+5. **Disfruta** de la transición suave al tablero de juego
+
+Una vez que selecciones "Jugar", el juego:
+- Reproduce un efecto de sonido de inicio
+- Cambia automáticamente a la vista del tablero de juego
+- Inicia la música de fondo del gameplay
+- Comienza a generar la primera pieza que caerá
+
+#### Pantalla de Juego
+Una vez que inicies una partida, verás la interfaz principal del juego:
+
+![Pantalla de juego](assets/images/pantalla-juego.png)
+
+**Elementos de la interfaz de juego:**
+
+**Tablero Principal (Centro):**
+- **Área de juego**: Tablero de 10x20 donde caen y se posicionan las piezas
+- **Fondo negro**: Contraste perfecto para visualizar las piezas de colores
+- **Grid invisible**: Las piezas se alinean automáticamente en la cuadrícula
+
+**Panel Lateral Derecho:**
+- **Puntos**: Muestra tu puntuación actual que aumenta al completar líneas
+- **Nivel**: Indica el nivel de dificultad actual (mayor nivel = mayor velocidad)
+- **Pieza Siguiente**: Vista previa de la próxima pieza que caerá, permitiendo planificar tu estrategia
+
+**Información adicional:**
+- **Efectos visuales**: Las líneas completadas parpadean antes de desaparecer
+- **Indicadores de posición**: La pieza actual se puede mover libremente hasta tocar el suelo o otra pieza
+- **Feedback inmediato**: Sonidos diferentes para mover piezas, completar líneas y game over
+
+**Estrategia con el panel lateral:**
+1. **Observa la pieza siguiente** para planificar dónde colocar la pieza actual
+2. **Monitorea tu puntuación** para seguir tu progreso
+3. **Prepárate para el aumento de nivel** que incrementa la velocidad de caída
+
+#### Pantalla de Pausa
+Durante cualquier partida, puedes pausar el juego presionando la tecla **Q**. Esto te llevará al menú de pausa:
+
+![Pantalla de pausa](assets/images/Pantalla de pausa.png)
+
+**Opciones disponibles en pausa:**
+- **[Q] Reanudar**: Continúa la partida exactamente donde la dejaste
+- **[R] Reiniciar**: Comienza una nueva partida desde cero
+- **[M] SALIR**: Termina el juego y regresa al menú principal
+
+**Características del menú de pausa:**
+- **Pausa automática de música**: La banda sonora se detiene mientras estás en pausa
+- **Estado preservado**: Tu progreso, puntuación y posición de las piezas se mantienen intactos
+- **Tiempo ilimitado**: No hay límite de tiempo para permanecer en pausa
+- **Efectos de sonido**: Al reanudar o reiniciar se reproducen sonidos especiales
+
+**Cuándo usar la pausa:**
+- **Estrategia**: Tómate tu tiempo para planificar tu próximo movimiento
+- **Descansos**: Pausa cuando necesites una pausa sin perder tu progreso
+- **Emergencias**: Interrupciones inesperadas sin consecuencias en el juego
+- **Análisis**: Estudia el tablero y la pieza siguiente sin presión de tiempo
+
+#### Pantalla de Récords
+Para ver los mejores puntajes alcanzados, selecciona la opción **"Scores"** del menú principal:
+
+![Opción Records](assets/images/opcion-records.png)
+
+**Visualización de los mejores puntajes:**
+- **Top 5 récords**: Muestra los 5 mejores puntajes de todos los tiempos
+- **Puntuaciones ordenadas**: De mayor a menor puntuación
+- **Persistencia automática**: Los récords se guardan automáticamente en el archivo `record.txt`
+- **Histórico completo**: Permite revisar tu progreso y establecer nuevas metas
+
+**Características de la pantalla de récords:**
+- **Interfaz clara**: Presentación ordenada y fácil de leer
+- **Navegación simple**: Usa **Escape** o **Enter** para regresar al menú principal
+- **Actualización automática**: Los nuevos récords se añaden automáticamente al completar una partida
+- **Motivación**: Visualiza tus logros y compite contigo mismo
+
+**Cómo establecer un nuevo récord:**
+1. **Juega** y trata de conseguir la puntuación más alta posible
+2. **Completa líneas múltiples** para obtener más puntos
+3. **Sobrevive** a niveles más altos para multiplicar tu puntuación
+4. **Al finalizar** la partida, tu puntaje se compara automáticamente con los récords existentes
+5. **Si calificas**, tu nuevo récord aparecerá en la lista la próxima vez que veas los "Scores"
+
+#### Durante el Juego
+- **Área de juego**: Tablero principal de 10x20 donde caen las piezas
+- **Panel lateral**: Muestra puntuación, nivel y vista previa de la siguiente pieza
+- **Indicadores visuales**: Efectos de líneas completadas con animación de parpadeo
+
+#### Consejos de Juego
+- **Planifica ahead**: Observa la pieza que viene en el panel lateral
+- **Elimina líneas múltiples**: Completa varias líneas a la vez para mayor puntuación
+- **Usa la pausa**: Presiona **Q** para pausar y pensar tu próximo movimiento
+- **Gestiona la velocidad**: A mayor nivel, las piezas caen más rápido
+
 ## Requisitos del Sistema
 
 ### Sistemas Operativos Soportados
 - **Windows** 10/11
-- **Linux** (Ubuntu 18.04+, Fedora 30+, etc.)
 - **macOS** 10.15+ (Catalina o superior)
 
 ### Herramientas de Desarrollo
 - **Compilador C++**: Compatible con C++11 o superior
-  - Linux: `g++` 7.0+
   - macOS: `clang++` (Xcode Command Line Tools)
   - Windows: `g++` (MinGW) o Visual Studio 2017+
 - **Make**: Para ejecutar el sistema de compilación
@@ -122,19 +247,6 @@ cd Tetris
 ```
 
 ### 2. Instalar Dependencias
-
-#### Linux (Ubuntu/Debian)
-```bash
-sudo apt update
-sudo apt install build-essential libsfml-dev
-```
-
-#### Linux (Fedora/CentOS)
-```bash
-sudo dnf install gcc-c++ make SFML-devel
-# o en CentOS/RHEL:
-sudo yum install gcc-c++ make SFML-devel
-```
 
 #### macOS
 ```bash
@@ -159,7 +271,7 @@ make
 
 ### Ejecutar el Juego
 ```bash
-# En Linux/macOS
+# En macOS
 ./bin/tetris
 
 # En Windows
@@ -264,10 +376,6 @@ g++ -std=c++11 -g -Iinclude src/*.cpp -o bin/tetris_debug \
 # Verificar dependencias dinámicas (macOS)
 otool -L bin/tetris
 
-# Verificar dependencias dinámicas (Linux)
-ldd bin/tetris
-```
-
 ## Solución de Problemas
 
 ### Errores Comunes
@@ -278,8 +386,7 @@ ldd bin/tetris
 # macOS con Homebrew
 export PKG_CONFIG_PATH="$(brew --prefix)/lib/pkgconfig"
 
-# Linux
-sudo ldconfig
+
 ```
 
 #### 2. "Permission denied" al ejecutar
@@ -295,18 +402,9 @@ cd /ruta/al/proyecto/Tetris
 ./bin/tetris
 ```
 
-#### 4. Audio no funciona en Linux
-**Solución**: Instalar dependencias de audio:
-```bash
-sudo apt install libopenal1 libopenal-dev libvorbis-dev libflac-dev
-```
-
 #### 5. Problemas de renderizado en macOS
 **Solución**: Actualizar drivers gráficos y verificar compatibilidad con OpenGL:
 ```bash
-# Verificar versión de OpenGL
-system_profiler SPDisplaysDataType | grep OpenGL
-```
 
 ### Logs y Debugging
 Para obtener información de debug, puedes modificar temporalmente el código para mostrar información adicional o usar herramientas como `gdb`:
